@@ -61,6 +61,8 @@
 
 ### script
 
+- 모든 script를 일일이 실행하지 않아도 `package.json`의 `script`에 정의한 key로 script 실행
+- 특정 script들을 조합해서 실행하는 등 복잡한 동작 가능
 - `node index.js` : Javascript 파일 실행
   - `node` 명령어 실행 전에 다른 작업을 할 수도 있음
   - `node` 명령어를 사용해서 실행하지 않을 것
@@ -99,15 +101,16 @@
       }
     }
     ```
-  - `npm install`만 실행하면, `npm`이 `dependencies`를 찾아서 모든 의존성 package를 설치해 준다.
+  - `npm install`만 실행하면, `npm`이 `dependencies`와 `devDependencies`에 명시된 package들을 찾아서 필요한 의존성 package들을 설치해 준다.
   - Project를 github에 올릴 때 용량이 큰 `node_modules`를 업로드하지 않아도 됨
   - `package.json`, `package-lock.js`, `index.js`만 공유하면 상대방이 프로젝트를 실행할 수 있음`
 
 ## Babel
 
 - 최신 javascript를 모든 곳에서 동작하는 stable javascript로 컴파일
-  - nodeJS 버전이 오래되었다면 최신 javascript 코드를 실행하지 못할 수도 있음
-  - Babel을 사용해서 최신 javascript code를 nodeJS가 이해할 수 있는 javascript 코드로 변환
+- nodeJS 버전이 오래되었다면 최신 javascript 코드를 실행하지 못할 수도 있음
+- Babel을 사용해서 최신 javascript code를 nodeJS가 이해할 수 있는 javascript 코드로 변환
+  - ES6+ 문법을 지원하지 않는 환경에서는 호환되는 ES5 이하 문법으로 변환해줌
   - 현재 nodeJS가 특정 javascript code를 이해할 수 있는지 걱정하지 않아도 됨
 
 ### Installation
@@ -122,14 +125,16 @@
    - `--save-dev`를 사용하지 않으면 `dependencies`에 추가됨
    - 이 옵션의 유무에 상관없이 dependency로 추가된 package들은 `node_modules`에 저장됨
    - 옵션을 잘못 사용했더라도 `package.json`에서 dependency 위치만 옮겨주면 됨
-2. Preset 설치 : `@babel/perset-env`
+2. Preset 설치 : `@babel/preset-env`
    ```shell
    npm i @babel/preset-env --save-dev
    ```
    - preset : babel이 사용하는 거대한 plugin
    - preset-env : 최신 javascript를 사용할 수 있음
 3. `babel.config.json` 파일 생성
-   - 파일을 찾아서 preset을 설정하게 됨
+   - `babel-node` 명령어를 사용하기 위해 필요한 설정 파일
+   - 필요한 plugin 설치
+     - `preset-env` : 최신 javascript를 사용하게 해 주는 plugin
 
 ### Usage
 
@@ -142,6 +147,7 @@
 - Babel을 직접 사용하는 대신 `package.json`의 `script` 활용
   - `@babel/node` 설치
   - `babel-node` 명령어를 사용할 수 있음
+    - js 파일이 babel에 의해 컴파일될 수 있도록 `babel-node` 명령어로 실행
   - `script`에서 `"win": "node index.js"`를 `"dev": "babel-node index.js"`로 변경
     - babel이 적용된 뒤 nodeJS가 실행됨
     - `babel-node` 명령어를 사용하면 nodeJS가 이해하지 못하는 최신 코드를 사용해서 빌드할 수 있음
