@@ -1,6 +1,8 @@
 # Nomad Coder Youtube Clone
 
-- I took the Youtube clone lecture at the Nomad coder ([Link](https://nomadcoders.co/wetube))
+- I took the Youtube clone lecture at the Nomad coder
+- [Nomadcoders](https://nomadcoders.co/)
+- [Lecture](https://nomadcoders.co/wetube)
 
 ## Skills
 
