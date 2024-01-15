@@ -14,6 +14,10 @@ app.set("views", process.cwd() + "/src/views");
 
 const logger = morgan("dev");
 app.use(logger);
+
+const parser = express.urlencoded({ extended: true });
+app.use(parser);
+
 app.use("/", globalRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);

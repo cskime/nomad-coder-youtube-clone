@@ -167,6 +167,10 @@ app.set("view engine", "pub");
     ```pug
     h1 #{pageTitle} | Wetube
     ```
+- Attribute value로 사용할 수는 없다. 이 때는 javascript의 String template 사용
+  ```javascript
+  a(href=`/videos/${video.id}`) #{video.title}
+  ```
 
 ### [Conditional](https://pugjs.org/language/conditionals.html)
 

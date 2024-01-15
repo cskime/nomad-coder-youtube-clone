@@ -1,4 +1,12 @@
 extends base.pug
 
 block content
-    h1 Watch Video!
+    h3 #{video.views} #{video.views === 1 ? "view" : "views"}
+
+    //- [ Absolute vs. Relative URL in href ]
+    //- `/`을 붙이면 absolute url로 동작
+    //- Root : localhost:4000
+    //- Current : localhost:4000/videos/1
+    //- `href="/edit" : `{ROOT}/edit`으로 이동
+    //- `href="edit" : `{CURRENT}/edit`으로 이동
+    a(href=`${video.id}/edit`) Edit Video &rarr;
