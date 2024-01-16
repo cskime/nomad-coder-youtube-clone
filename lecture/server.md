@@ -116,6 +116,9 @@
   });
   ```
 
+  - `return`은 생략할 수 있음. `Response`의 어떤 method를 호출하는지가 중요
+  - Response를 두 번 이상 보낼 수 없음. 실수 방지를 위해 `return` 키워드를 사용해서 뒤에 실수로 작성되는 코드의 실행을 막을 수 있다.
+
 ### Middleware
 
 - 브라우저가 request를 보내고 server가 response를 돌려주는 사이에서 동작하는 software

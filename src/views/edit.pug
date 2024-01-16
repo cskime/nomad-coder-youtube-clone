@@ -1,13 +1,6 @@
 extends base.pug
 
 block content
-    //- `action`을 지정하지 않으면 현재 URL로 request를 보냄
-    //- `method`로 request method 지정 -> 수정한 내용을 DB에 업데이트 할 것이므로 'POST' 사용
-    //- GET vs POST request
-    //-   Get : data 요청
-    //-   POST : 파일을 보내거나 database의 값 변경
-    //-   GET method로 보내는 요청은 parameter가 URL에 ?{name}={value} 형태로 추가됨
-    //-   POST method로 보내는 요청은 parameter가 URL에 parameter가 붙지 않음
     form(method="POST")
         h4 Change title of the video
         input(name="title", placeholder="Video Title", value=video.titl, required)

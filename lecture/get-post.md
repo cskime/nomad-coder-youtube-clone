@@ -93,6 +93,7 @@
     return res.redirect(`/videos/${id}`);
   });
   ```
+- 브라우저 이동 경로 : `videos/1/edit` --(redirect)--> `/videos/1`
 
 ### urlencoded()
 
