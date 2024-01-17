@@ -61,6 +61,7 @@
   - These methods are also implemented
 - Request
   - `request.params` : It's an object containing properties mapped to the named route "parameters".
+  - `request.query` : It's an object containing a property for each query string parameter.
   - `request.body` : It contains key-value pairs of data submitted in the request body.
     - default `undefined`
     - It's populated when you use body parsing middleware.

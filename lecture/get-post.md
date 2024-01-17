@@ -23,9 +23,11 @@
   - `action="/some-path"` : absolute URL로 요청
   - `action="some-path"` : relative URL로 요청
   - [Absolute, relative path 차이](#absolute-vs-relative-path)
-- 내부 `<input>`의 parameter 설정
-  - `<form>` 안에서 submit이 발생하면 내부 `<input>`에 설정된 값들이 parameter로 사용됨
+- 내부 `<input>`의 attribute 설정
+  - `<form>` 안에서 submit이 발생하면 내부 `<input>`에서 `name`과 `value` attribute에 설정된 값들이 parameter로 전달됨
   - Parameter들은 method에 따라 다른 방식으로 request에 담겨 backend로 전송
+  - GET : URL에 추가됨 (`?name=value&name2=value2`)
+  - POST : HTTP request의 body에 추가됨
   - `<input name="title" value="It's a title" />`일 때
     - `name` : parameter의 key로 사용
     - `value` : parameter의 value로 사용

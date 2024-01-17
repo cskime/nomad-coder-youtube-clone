@@ -249,10 +249,15 @@ app.use("/users", userRouter);
      ```
   2. Parameter에 **매칭될 수 있는 값에 제약** 추가
      - Express는 route URL에 **정규식** 패턴을 사용할 수 있음
-     - 숫자로 된 id만 받고 싶다면, `/:id(\\d+)` URL로 routing
-       ```javascript
-       router.get("/:id(\\d+))", see);
-       router.get("/upload", upload);
-       ```
+     - URL parameter 뒤에 소괄호(`()`)로 regex 입력
+       - 숫자로 된 id만 받고 싶다면, `/:id(\\d+)` URL로 routing
+         ```javascript
+         router.get("/:id(\\d+))", watch);
+         router.get("/upload", upload);
+         ```
+       - (db 추가 후) MongoDB가 부여하는 id는 24byte hex string이므로, 이에 맞는 regex 입력
+         ```js
+         router.get("/:id([0-9a-f]{24})", watch);
+         ```
      - 정규식으로 제약을 걸면, `id` 자리에 문자열이 올 때는 parameter에 매칭되지 않으므로 `/upload`에 정상적으로 접근
      - `id`는 없어도 동작하지만, `request.params`에서 가져오기 위해 이름 필요

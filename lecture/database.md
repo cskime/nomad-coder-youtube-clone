@@ -86,7 +86,9 @@
 ### Schema와 Model
 
 - Model : data를 다루는 객체
-- Schema : 어떤 데이터가 어떤 타입으로 사용되는지 명시한 것
+- Schema
+  - 어떤 데이터가 어떤 타입으로 사용되는지 명시한 것
+  - **Validation**을 위한 것
 - Mongoose에 data schema 설정
   ```js
   // Video.js
@@ -115,75 +117,82 @@
           }
         })
         ```
+      - Available options example:
+        - `lowercase` : Boolean, always call `.toLowerCase()` on the value
+        - `uppercase` : Boolean, always call `.toUpperCase()` on the value
+        - `trim` : Boolean, always call `.trim()` on the value
+        - `match` : RegEx,
+        - `maxLength` : Number, checks if the value length is not less than the given number
+        - `minLength` : Number, checks if the value length is not greater than the given number
 - Model 생성 시 이름과 schema 전달
   ```js
   // Model : schema definition에 기반해 생성될 data structure
   // Document : Model class의 instance
-  const document = mongoose.model("Video", videoSchema);
+  const Model = mongoose.model("Video", videoSchema);
   ```
-  - Mongoose model의 이름을 만들 때 첫 글자를 대문자로 만드는 convention이 있음
-  - Mongoose의 model class에 정의된 method를 사용할 때, Model type으로부터 호출하는 것 처럼 보이려고 하는듯..
+  - Model의 이름(type)으로 사용되는 word는 첫 글자를 대문자로 사용
+  - Model instance를 저장한 변수는 같은 이름을 가지기 때문에, 이와 구별하기 위한 것
 
-### CRUD
+## CRUD
 
-- Model의 CRUD 작업
-- Create
-  - `new` 연산자와 함께 생성자 호출하여 model object 생성
+### Create
+
+- `new` 연산자와 함께 생성자 호출하여 model object 생성
+  ```js
+  const video = new Video({
+    title: title,
+    description: description,
+    createdAt: Date.now(),
+    hashtags: hashtags.split(",").map((word) => `#${word}`),
+    meta: {
+      views: 0,
+      rating: 0,
+    },
+  });
+  ```
+  - 이 때, 미리 설정한 schema에 맞는 field와 type을 사용해야 함
+  - Schema에서 정의한 field를 빼먹어도 model은 정상적으로 생성된다.
     ```js
+    // title만 가지고 model을 만들지만 error가 발생하지 않음
     const video = new Video({
       title: title,
-      description: description,
-      createdAt: Date.now(),
-      hashtags: hashtags.split(",").map((word) => `#${word}`),
-      meta: {
-        views: 0,
-        rating: 0,
-      },
     });
     ```
-    - 이 때, 미리 설정한 schema에 맞는 field와 type을 사용해야 함
-    - Schema에서 정의한 field를 빼먹어도 model은 정상적으로 생성된다.
+    - 실수로 data를 넣지 않는 것을 방지하려면, scheme을 정의할 때 해당 field를 필수값으로 설정하거나,
       ```js
-      // title만 가지고 model을 만들지만 error가 발생하지 않음
-      const video = new Video({
-        title: title,
+      const videoSchema = new mongoose.Schema({
+        ...
+        createdAt: { type: Date, required: true },
+        ...
       });
       ```
-      - 실수로 data를 넣지 않는 것을 방지하려면, scheme을 정의할 때 해당 field를 필수값으로 설정하거나,
-        ```js
-        const videoSchema = new mongoose.Schema({
-          ...
-          createdAt: { type: Date, required: true },
-          ...
-        });
-        ```
-      - 기본값을 설정해서 해당 field에 대응되는 값이 없을 때 기본값을 사용한다.
-        ```js
-        // Date.now()는 즉시 실행되므로, function만 전달하면 mongoose가 필요할 때 실행한다.
-        const videoSchema = new mongoose.Schema({
-          ...
-          createdAt: { type: Date, default: Date.now },
-          ...
-        });
-        ```
-  - `save()` method를 호출하여 model을 database에 저장
-    ```js
-    const newVideo = new Video({...});
-    await newVideo.save();
-    // or, take the model which is saved in database
-    const saved = await newVideo.save();
-    ```
-    - Database writing을 기다리기 위해 `await` 사용
-  - `create()` : Javascript object 생성 후 `save()`로 database에 저장하는 것을 한 번에
-    ```js
-    await Video.create({...});
-    ```
+    - 기본값을 설정해서 해당 field에 대응되는 값이 없을 때 기본값을 사용한다.
+      ```js
+      // Date.now()는 즉시 실행되므로, function만 전달하면 mongoose가 필요할 때 실행한다.
+      const videoSchema = new mongoose.Schema({
+        ...
+        createdAt: { type: Date, default: Date.now },
+        ...
+      });
+      ```
+- `save()` method를 호출하여 model을 database에 저장
+  ```js
+  const newVideo = new Video({...});
+  await newVideo.save();
+  // or, take the model which is saved in database
+  const saved = await newVideo.save();
+  ```
+  - Database writing을 기다리기 위해 `await` 사용
+- `create()` : Javascript object 생성 후 `save()`로 database에 저장하는 것을 한 번에
+  ```js
+  await Video.create({...});
+  ```
 
 ### Read
 
-- `find()`
+- `find({})`
 
-  - Database에서 가져온 documents 반환
+  - Database에서 documents를 가져옴
   - v6.0부터 `find()`는 callback function을 받지 않으므로 `Promise`로 구현해야 함
 
     ```js
@@ -205,7 +214,79 @@
     }
     ```
 
-### Exceptions and Validation
+  - 검색(find)할 때 사용할 filter 추가
+    ```js
+    Video.find({
+      title: keyword; // `title` field 값이 keyword와 일치하는 document만 검색
+      // or
+      title: { // filter 사용
+        $regex: new RegExp(keyword, "i") // Regular Extression으로 검색
+        $gt: 3 // greater than 3
+      }
+    });
+    ```
+    - Regular expression을 사용해서 특정 단어를 포함하고 있는 data 등 복잡한 조건으로 검색 가능
+    - RegEx option
+      - `i` : ignore case
+      - `g` : global
+    - `$regex`
+      - MongoDB의 Query operator
+      - Regular expression을 사용해서 query할 수 있음
+    - `RegExp` 사용 예시
+      - `new RegExp(keyword, "i")` : case insensitive하게 keyword를 포함하는 모든 data를 찾음
+      - `keyword$` : keyword라는 단어로 끝나는 것만 찾음
+      - `^keywod` : keyword라는 단어로 시작하는 것만 찾음
+  - `exec()`
+    - `find~()` 호출한 뒤 chain할 수 있는 method
+      ```js
+      Model.find({})
+        .exec() // return Promise
+        .then(~);
+      // or use await
+      await Model.find({});
+      ```
+    - `Promise`를 반환하여 비동기 코드를 작성할 수 있다.
+    - `async`, `await`을 사용한다면 `Promise`를 사용할 필요가 없으므로 생략 가능
+
+- `findOne()` : 전달한 condition에 해당하는 model 검색
+  ```js
+  Model.findOne({ key: value }).exec();
+  ```
+- `findById()` : `id`로 model 검색
+  ```js
+  Model.findById(id).exec();
+  ```
+- `exist(filterObject)`
+  - Query와 매칭되는 data가 database에 존재하는지 확인하고 `boolean` 반환
+  - Model을 직접 사용할 것이 아니면 data를 `find~()`로 가져올 필요가 없다.
+  - 사용 방법
+    ```js
+    // `_id` field의 값이 `id`인 data가 존재하는지 `true`/`false`로 반환
+    const isExist = await Model.exist({ _id: id });
+    ```
+
+### Update
+
+- `find~({})`로 model을 가져와서 field 수정 후 `save()`
+- `findByIdAndUpdate()` : 이 과정을 한 번에 할 수 있는 축약형
+
+### Delete
+
+- `findByIdAndDelete()` : `find~({})`로 video를 찾아서 `delete()`하는 작업의 shortcut
+- 과거 버전에서는 delete와 remove가 각각 존재했지만 최신 버전에서는 remove는 없음
+  - 특별한 이유가 없으면 delete를 사용하라고 함
+  - Remove는 rollback할 수 없다고 함
+
+## Query
+
+- MongoDB/Mongoose는 빠른 query 성능을 가짐
+- `sort({})` : Database에서 가져온 결과 정렬
+  ```js
+  // { 정렬할 기준 field: "asc" or "desc" }
+  const videos = await Video.find({}).sort({ createdAt: "desc" });
+  ```
+
+## Exceptions and Validation
 
 - Mongoose는 실제 model data를 schema에서 지정한 타입에 대해 **유효성 검사** 수행
 - Schema에 맞지 않는 type의 value를 사용하면 `ValidationError`가 발생한다.
@@ -226,6 +307,43 @@
   ```
 - `try-catch` 문법으로 error handling 필요
 
+## Middleware
+
+- Middleware 또는 "pre and post hooks" 라고 부르기도 함
+- Schema level에서 정의 (**model을 생성하기 전에 설정이 완료되어야 한다.**)
+- Database가 변경되기 이전(pre hook) 또는 이후(post hook) 실행될 function을 정의한다.
+  - Express의 middleware : request가 발생했을 때 response 반환 전에 처리할 작업 수행
+  - Mongoose의 middleware : database 변경 전/후로 처리할 작업 수행
+- 4가지 middleware types : document, model, aggregate, query
+- 각 middleware에 해당하는 function에 대해 `pre` 또는 `post` hooked function 정의
+  - hooks
+    - `pre()` : middleware 실행 **이전**에 hooked function 실행
+    - `post()` : middleware 실행 **이후**에 hooked function 실행
+    - Hooked function 안에서 `this` 식별자로 document instance 참조
+  - Document middleware : `save`
+    - Hooked function 안에서 `this`로 document 참조
+  - Query middleware : `findOneAndUpdate`
+    - `findByIdAndUpdate()` method는 내부적으로 `findoneAndUpdate()`를 호출함
+    - 즉, 두 method 모두 실행 시 `findOneAndUpdate` middleware가 실행된다.
+    - Hooked functino 안에서 `this._update`로 document 참조
+- 사용 방법
+  ```js
+  // pre(name, function) : `name` function이 호출되기 "이전"에 function 실행
+  schema.pre("save", function () { ... }); // `save()` 호출 시
+  schema.pre("findOneAndUpdate", function () { ... }); // `findByIdAndUpdate()` 호출 시
+  ```
+- [Document](https://mongoosejs.com/docs/middleware.html)
+
+## Static function
+
+- `static(name, function)`으로 model에서 호출할 수 있는 static function을 직접 정의할 수 있다.
+- Schema level에서 정의해야 함
+- 사용 방법
+  ```js
+  schema.static("myFunction", function (param) { ... });
+  ```
+- [Document](https://mongoosejs.com/docs/guide.html#statics)
+
 ## Modularization
 
 - Database 연결하는 코드를 별도 module로 분리 (`database.js`)
@@ -243,9 +361,7 @@
     - Database와 model이 app 시작 전에 pre-compile 될 수 있도록 server 가장 처음에 import
     - Module import 시점에 해당 코드가 실제로 실행되면서 db연결 및 model object 생성
 
-## Javascript 문법
-
-### Promise와 callback
+## Javascript: Promise와 callback
 
 - 순서가 중요한 작업에서 실행과 동시에 결과가 반환되지 않는 작업들은 종료 시점을 알 수 있어야 함
   - Database에서 data를 가져올 때 지연시간이 발생할 수 있음
