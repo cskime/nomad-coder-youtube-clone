@@ -133,6 +133,33 @@ HTML template language
     - Iterate `values` as a `value`.
     - If `values` are empty, execute `else` block.
 
+## MongoDB & Mongoose
+
+- MongoDB
+  - `mongosh`
+  - `show dbs`
+  - `use {db}`
+  - `show collections`
+  - `db.{collection}.find()`
+- Mongoose
+  - `connect(databaseURI)`
+  - `connection`
+  - Database
+    - `on(event, handler)`
+    - `once(event, handler)`
+  - Model
+    - `new Schema({})`
+      - `static(functionName, function object)`
+    - `model("name", schema)`
+    - `new Model({})`
+    - `await Model.create({})`
+    - `await model.save()`
+    - `await Model.find({})`
+    - `await Model.findOne({})`
+    - `await Model.findById({})`
+    - `await Model.findByIdAndUpdate({})`
+    - `await Model.exist({})`
+
 ## Architecture
 
 - Main (server.js) : It's a entry point of node.js app
