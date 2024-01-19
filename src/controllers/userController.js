@@ -87,10 +87,13 @@ export const postLogin = async (req, res) => {
     });
   }
 
-  /* [ Login Success] 
+  /* [ Login 여부 저장 ] 
     - username을 갖는 `User`가 존재하고, password도 일치하면 login에 성공하는 것
-    - 브라우저가 현재 로그인 되어 있다는 것을 알 수 있는 방법 -> Cookie, Session
+    - Login에 성공하면 user 정보를 session에 저장
+      - Session은 user(or client, or browser)마다 별도로 가짐
   */
+  req.session.isLoggedIn = true;
+  req.session.user = user;
   res.redirect("/");
 };
 
