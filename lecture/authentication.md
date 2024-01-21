@@ -87,68 +87,98 @@
 
 ## Login과 Session
 
-- 로그인을 위한 검사
-  - 입력한 username으로 된 `User`가 database에 있는지 검사
+### 로그인을 위한 검사
+
+- 입력한 username으로 된 `User`가 database에 있는지 검사
+
+```js
+const user = await User.findOne({ username });
+if (!user) {
+  return res.status(400).render("login", {
+    pageTitle: "Login",
+    errorMessage: "An account with this username does not exists.",
+  });
+}
+```
+
+- 입력한 password의 hash value가 database에 저장된 `User`의 hashed password와 일치하는지 검사
+
+```js
+const user = await User.findOne({ username });
+const isMatched = await bcrypt.compare(password, user.password);
+if (!isMatched) {
+  return res.status(400).render("login", {
+    pageTitle,
+    errorMessage: "Wrong password.",
+  });
+}
+```
+
+### 로그인 후 사용자 인증 처리
+
+- `express-session` : Express에서 session을 처리할 수 있게 해 주는 middleware를 제공하는 package
+  - 설치 : `npm i express-session`
+- 브라우저가 backend와 상호작용할 때마다(request를 보낼 때 마다) session middleware를 통해 브라우저에 cookie를 전송해 줌
+  - Cookie에는 session ID가 들어 있음
+  - Session data 자체는 server에 저장, cookie에는 session ID만 저장
+- 브라우저는 backend에 request를 보낼 때 cookie를 추가함 (직접 할 필요 없다)
+- Router를 연결하기 전에 express app에 session middleware 추가
   ```js
-  const user = await User.findOne({ username });
-  if (!user) {
-    return res.status(400).render("login", {
-      pageTitle: "Login",
-      errorMessage: "An account with this username does not exists.",
-    });
-  }
+  const sessionHandler = session({
+    secret: "Hello",
+    resave: true,
+    saveUninitialized: true,
+  });
+  app.use(sessionHandler);
   ```
-  - 입력한 password의 hash value가 database에 저장된 `User`의 hashed password와 일치하는지 검사
+  - 브라우저에서 웹사이트에 방문할 때 마다 새 session ID를 만들고 브라우저에 전송
+  - 브라우저는 cookie에 session ID를 저장하고, `express-session`도 session DB에 session을 저장
+  - 이후 브라우저가 **같은 domain으로 모든 URL에 요청을 보낼 때 마다** session id가 저장된 cookie를 서버에 전송
+  - 서버는 **어떤 user(브라우저)에서 요청을 보냈는지** 알 수 있음 (전송된 id가 session DB에 저장되어 있는지 확인)
+- Session은 하나의 객체로, 임의의 값을 추가할 수도 있다.
   ```js
-  const user = await User.findOne({ username });
-  const isMatched = await bcrypt.compare(password, user.password);
-  if (!isMatched) {
-    return res.status(400).render("login", {
-      pageTitle,
-      errorMessage: "Wrong password.",
-    });
-  }
+  // /add-one URL에서 계속 새로고침하면 session의 `potato` 값이 1씩 증가한다.
+  app.get("/add-one", (req, res) => {
+    req.session.potato += 1; // property 동적 할당
+    return res.send(`${req.session.id} \n ${req.session.potato}`);
+  });
   ```
-- 로그인 후 사용자 인증 처리
-  - `express-session` : Express에서 session을 처리할 수 있게 해 주는 middleware를 제공하는 package
-    - 설치 : `npm i express-session`
-  - 브라우저가 backend와 상호작용할 때마다(request를 보낼 때 마다) session middleware를 통해 브라우저에 cookie를 전송해 줌
-  - 브라우저는 backend에 request를 보낼 때 cookie를 추가함 (직접 할 필요 없다)
-  - Router를 연결하기 전에 express app에 session middleware 추가
-    ```js
-    const sessionHandler = session({
-      secret: "Hello",
-      resave: true,
-      saveUninitialized: true,
+- 저장된 모든 session 확인
+  ```js
+  app.use((req, res, next) => {
+    req.sessionStore.all((error, sessions) => {
+      console.log(sessions);
+      next();
     });
-    app.use(sessionHandler);
-    ```
-    - 브라우저에서 웹사이트에 방문할 때 마다 새 session ID를 만들고 브라우저에 전송
-    - 브라우저는 cookie에 session ID를 저장하고, `express-session`도 session DB에 session을 저장
-    - 이후 브라우저가 **같은 domain으로 모든 URL에 요청을 보낼 때 마다** session id가 저장된 cookie를 서버에 전송
-    - 서버는 **어떤 user(브라우저)에서 요청을 보냈는지** 알 수 있음 (전송된 id가 session DB에 저장되어 있는지 확인)
-  - Session은 하나의 객체로, 임의의 값을 추가할 수도 있다.
+  });
+  ```
+  - Backend는 생성된 모든 session id를 관리함
+  - Session store : session을 저장하는 곳
+    - 테스트를 위한 임시 저장소(in memory)
+    - 서버가 재시작되면 저장된 모든 session이 삭제된다.
+    - MongoDB와 연결해서 session들을 영구적으로 저장해야 함
+- Session 영구 저장하기
+  - `express-session`이 session을 저장하는 기본 storage는 `MemoryStore`
+  - `MemoryStore`는 실제로 사용하기 위한 것이 아니므로, 서버가 종료되면 저장된 session이 삭제됨
+  - Session을 database에 저장해서 서버가 종료되어도 session이 유지될 수 있도록 설정
+  - `express-session`은 다양한 종류의 database를 연동할 수 있게 지원함
+  - MongoDB에 연동하기 위해 `connect-mongo` package 설치
+    - `npm i connect-mongo`
+  - Session middleware를 만들 때 `store`를 `MongoStore`로 교체
     ```js
-    app.get("/add-one", (req, res) => {
-      req.session.potato += 1; // property 동적 할당
-      return res.send(`${req.session.id} \n ${req.session.potato}`);
-    });
+    app.use(
+      session({
+        secret: "Hello",
+        resave: true,
+        saveUninitialized: true,
+        // MongoStore로 교체
+        store: MongoStore.create({
+          mongoUrl: "mongodb://127.0.0.1:27017/wetube",
+        }),
+      })
+    );
     ```
-  - 저장된 모든 session 확인
-    ```js
-    app.use((req, res, next) => {
-      req.sessionStore.all((error, sessions) => {
-        console.log(sessions);
-        next();
-      });
-    });
-    ```
-    - Backend는 생성된 모든 session id를 관리함
-    - Session store : session을 저장하는 곳
-      - 테스트를 위한 임시 저장소(in memory)
-      - 서버가 재시작되면 저장된 모든 session이 삭제된다.
-      - MongoDB와 연결해서 session들을 영구적으로 저장해야 함
-  - 각 session들은 개별적으로 key-value 쌍 데이터를 저장할 수 있음
+  - MongoDB에 `sessions` collection이 생성되고, 이후 서버가 생성한 session 정보는 MongoDB에 저장됨
 
 ### Login User 기억하기
 
@@ -248,3 +278,115 @@
     ```js
     h1 You are #{isLoggedIn ? "already logged In" : "not logged in"}
     ```
+
+## Session 사용 방식 개선하기
+
+- `express-session`으로부터 middleware 생성 시 `saveUninitialized` 속성을 `true`로 설정했다.
+- 이 설정은 웹사이트에 방문해서 서버에 요청하는 모든 사용자에 대해 session을 만들고 cookie로 전송해 준다.
+- 여기에는 **서버가 기억할 필요가 없는 User**들도 포함되어 있으므로, 모든 사용자의 session을 만들고 저장하는건 비효율적
+  - 로그인 하지 않고 둘러보기만 하는 user
+  - Bot user 등
+- 서버가 특정 사용자들에 대해서만 session을 저장해야 관리해야 한다.
+  - 즉, 모든 사용자에 대해 session을 생성하지만 **필요한 사용자의 session만 DB에 저장**한다.
+  - 필요하지 않은 사용자의 session은 무시한다.
+- 로그인 한 사용자만 기억하려고 하는 경우,
+  - Session을 저장할 대상은 "로그인 한 사용자" 이다.
+  - 로그인한 사용자의 session에는 `isLoggedIn: true` 또는 사용자 정보(`user`) 등이 추가된다.
+    ```js
+    const postLogin = (req, res) => {
+      ...
+      req.session.loggedIn = true;
+      req.sessions.user = user;
+      ...
+    }
+    ```
+  - 즉, **session object가 변경된 적이 없다면 로그인하지 않은 사용자이므로 session을 DB에 저장할 필요가 없다.**
+  - 로그인 한 사용자의 session만 DB에 저장하고 cookie에 session ID를 담아서 브라우저에 전송한다.
+- `express-session`은 `saveUninitialized` option으로 이 동작을 제어한다.
+  - `saveUninitialized: true` : 모든 session을 연결된 DB에 저장한다.
+  - `saveUninitialized: false` : 생성 후 변경된 적이 없는 session은 DB에 저장하지 않는다.
+    ```js
+    const sessionMiddleware = session({
+      ...
+      saveUninitialized: false,
+      ...
+    });
+    app.use(sessionMiddleware);
+    ```
+
+## Session 취약점 개선
+
+- Session을 사용할 때의 문제점은 '**백엔드가 session을 관리한다**'는 것
+- 외부에서 session ID 또는 token 등을 탈취해서 서버에 요청을 보내면, 서버는 정상 사용자라고 인식할 것
+- 따라서, 보안을 위한 설정이 필요하다.
+  - **Secret**
+    - Session cookie에 서명(sign)할 때 사용하는 문자열 값
+    - Cookie 서명 : 우리의 backend가 준 쿠키를 사용했다는 것을 보여주기 위해 수행
+    - 다른 사람이 session을 탈취하는 **session hijack 공격에 대응**하는 것
+      - Secret string으로 cookie를 sign해서 우리가 만든 것임을 증명할 수 있다.
+    - 따라서, **secret 값이 외부에 노출되지 않도록 보관**하고, **길이가 긴 무작위 문자열**로 생성해야 함
+  - **Database URL**
+    - Database URL을 알면 민감한 정보들이 담긴 database에 접근할 수 있으므로 노출되지 않도록 보호해야 함
+- 환경 변수(environment variable)
+
+  - 민감한 data가 외부에 공개되지 못하게 막을 때 사용하는 방법
+    - Database URL
+    - Secret Key
+    - API Key
+  - `process.env`로 application 환경 변수에 접근할 수 있다.
+  - GitHub에 업로드되지 않아야 하는 등 비공개로 유지해야 하는 데이터는 **환경 변수 파일(`.env`)**에 넣는다.
+    ```text
+    COOKIE_SECRET=asdfasdasd;lfkahsdgl;i129031k23li
+    DB_URL=mongodb://127.0.0.1:27017/wetube
+    ```
+    - `.env`는 `package.json`이 위치한 곳에 생성해야 한다. (root level에서 접근해야 하므로)
+    - `.gitignore`에 `.env`를 추가해서 민감한 데이터가 GitHub에 공개되지 않도록 막는다.
+  - `dotenv` package를 사용하면 `.env` 파일을 찾아서 `key=value` 값들을 읽은 후 `process.env`에 추가해 준다.
+    - `npm i dotenv`
+  - App이 실행된 후 가장 먼저 환경 변수가 설정되도록 만드는게 좋다.
+    - `require()` 사용 : 환경 변수를 사용하려는 **모든 파일**에서 개별적으로 선언해야 하므로 비효율적이다.
+      ```js
+      require("dotenv").config();
+      ...
+      ```
+    - `import` 사용 : entry point 등에서 한번 import하면 app 전역에서 환경 변수에 접근할 수 있다.
+      ```js
+      // init.js
+      import "dotenv/condfig" /* 가장 먼저 읽는 init.js 파일의 최상단에 import 한다. */
+      ...
+      ```
+  - 이후 `process.env`로 저장한 환경 변수에 접근한다.
+
+    ```js
+    // database 설정
+    import mongoose from "mongoose";
+    mongoose.connect(
+      process.env.DB_URL
+    ); /* 환경 변수에서 database URL 가져오기 */
+
+    // session middleware 설정
+    const sessionMiddleware = session({
+      secret: process.env.COOKIE_SECRET /* 환경 변수에서 secret key 가져오기 */,
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+        // 이미 mongoose가 MongoDB와 연결되어 있으므로
+        // mongoose의 client를 사용해서 만들 수도 있다.
+        // client: connection.client
+        mongoUrl: process.env.DB_URL /* 환경 변수에서 database URL 가져오기 */,
+      }),
+    });
+    app.use(sessionMiddleware);
+    ```
+
+### Cookie 구조
+
+- Domain : Cookie를 만든 backend server
+  - 브라우저는 domain별로 cookie를 저장함
+  - 요청하는 domain에 해당하는 cookie만 서버로 전송함
+- Expires
+  - `Session`
+    - 만료 날짜가 명시되지 않으면 브라우저에서 프로그램을 닫거나 컴퓨터를 재시작하면 session이 삭제됨
+    - 사용자가 닫지 않는 한 계속 살아 있음
+- Max Age : session의 만료 기한 설정
+  - `cookie: { maxAge: 20000 }`

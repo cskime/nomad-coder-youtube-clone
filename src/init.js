@@ -11,6 +11,7 @@
     - init.js가 실행될 때 server.js로부터 app을 import하는 과정에서 server app이 생성됨
  */
 
+import "dotenv/config";
 import "./database";
 import "./models/Video";
 import "./models/User";
