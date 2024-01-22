@@ -148,7 +148,6 @@ export const finishGitHubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(userData);
 
     const emailData = await (
       await fetch(`${apiUrl}/user/emails`, {
@@ -157,7 +156,6 @@ export const finishGitHubLogin = async (req, res) => {
         },
       })
     ).json();
-    console.log(emailData);
 
     const emailObject = emailData.find(
       (email) => email.primary && email.verified
@@ -170,7 +168,6 @@ export const finishGitHubLogin = async (req, res) => {
 
     let user = await User.findOne({ email: emailObject.email });
     if (!user) {
-      // create an account
       user = await User.create({
         email: emailObject.email,
         username: userData.login,
@@ -180,9 +177,15 @@ export const finishGitHubLogin = async (req, res) => {
         socialOnly: true,
         avatarUrl: userData.avatar_url,
       });
+    } else {
+      user.avatarUrl = userData.avatar_url;
     }
+
     req.session.isLoggedIn = true;
     req.session.user = user;
+
+    await User.findByIdAndUpdate(user._id, { avatarUrl: user.avatarUrl });
+
     return res.redirect("/");
   } else {
     return res.redirect("/login");
@@ -208,8 +211,6 @@ export const postEdit = async (req, res) => {
     file,
   } = req;
 
-  console.log(file ? file.path : avatarUrl);
-
   /* 변경하려는 email, username을 다른 user가 이미 사용하고 있다면 변경할 수 없게 막는다.
    * Database 검색 시 자기 자신은 제외하도록 query
    * 1. `$nor` : 해당 expression을 만족하지 않거나, expression에서 사용한 field가 없는 document 검색
@@ -229,10 +230,11 @@ export const postEdit = async (req, res) => {
    * 이 때, `findByIdAndUpdate`는 update 이전의 객체를 반환하므로,
    * `{ new: true }` option을 추가해야 updated user를 가져올 수 있다.
    */
+  const uploadedURL = `/${file ? file.path : avatarUrl}`;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     {
-      avatarUrl: file ? file.path : avatarUrl,
+      avatarUrl: uploadedURL,
       name,
       email,
       username,
@@ -251,6 +253,8 @@ export const postEdit = async (req, res) => {
    * - req.session.user = { ...req.session.user, name, email, username, location };
    */
   req.session.user = updatedUser;
+
+  await User.findByIdAndUpdate(_id, { avatarUrl: uploadedURL });
 
   /* res.render("edit-profile", ...)을 써도 되지만,
    * pageTitle 등을 전달하는 코드를 중복으로 사용하지 않기 위해 redirect
