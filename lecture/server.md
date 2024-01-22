@@ -125,7 +125,9 @@
 - callback handler가 곧 middleware
 - handler == MVC의 controller. 즉, 모든 controller는 middleware가 될 수 있다.
 - Response를 보내고 연결을 종료시키는 것을 제외한 handler 또는 controller는 middleware이다.
-- `next` : controller(handler)의 세 번째 argument\
+- 실제 request를 처리하는 controller 이전에 전처리를 위해 사용
+- **Controller에서 반복되는 코드가 있다면 middleware로 분리하는 것을 고려할 수 있다.**
+- `next` : controller(handler)의 세 번째 argument
 
   - `next()`를 호출하면 현재 실행되는 controller의 다음(next)번에 추가된 controller를 실행시킴 => **middleware로서 동작**
   - 가장 마지막에 있는 controller는 request를 종료하기 위해 `res.end()`, `res.send()` 등을 호출할 것이므로 middleware가 아님

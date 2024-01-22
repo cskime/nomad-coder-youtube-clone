@@ -207,11 +207,13 @@ export const postEdit = async (req, res) => {
     body: { name, email, username, location },
   } = req;
 
-  // 변경하려는 email, username 등이 이미 존재한다면 변경할 수 없게 막는다.
-  // body에 있는 email, username이 session에 저장된 것과 같다면 자기 자신의 정보
-  // 다르다면, 다른 user들의 email, username과 비교해 본다.
-  // 중복된다면 다시 edit page로 redirect
-
+  /* 변경하려는 email, username을 다른 user가 이미 사용하고 있다면 변경할 수 없게 막는다.
+   * Database 검색 시 자기 자신은 제외하도록 query
+   * 1. `$nor` : 해당 expression을 만족하지 않거나, expression에서 사용한 field가 없는 document 검색
+   * 2. `$or`로 email과 username 중 매칭되는 것을 찾되, `$ne`로 `_id`가 다른 document만 검색
+   *
+   * 해당 query의 검색 결과가 존재한다면 다른 page로 redirect
+   */
   const isExists = await User.exists({
     // $nor: [{ _id }],
     $or: [{ username }, { email }, { _id: { $ne: _id } }],
@@ -221,26 +223,95 @@ export const postEdit = async (req, res) => {
     return res.redirect("/users/edit");
   }
 
-  // Database에 저장된 User에 새 정보 업데이트
-  // 이 때, `findByIdAndUpdate`는 update 이전의 객체를 반환하므로
-  // `{ new: true }` option을 추가해야 updated user를 가져올 수 있다.
+  /* Database에 저장된 User에 새 정보 업데이트
+   * 이 때, `findByIdAndUpdate`는 update 이전의 객체를 반환하므로,
+   * `{ new: true }` option을 추가해야 updated user를 가져올 수 있다.
+   */
   const updatedUser = await User.findByIdAndUpdate(
     _id,
     { name, email, username, location },
     { new: true }
   );
 
-  // Database의 user와 session에 저장된 user는 독립된 객체
-  // Updated user data를 session에도 갱신시켜 주어야 한다.
+  /* Database의 user와 session에 저장된 user는 독립된 객체이므로 개별적으로 갱신해야 함
+   * 1. Database 업데이트 후 반환되는 user object를 req.session.user에 업데이트
+   * 2. req.session.user 객체의 property를 개별적으로 업데이트
+   *
+   * 1번 방법이 중복 코드가 적고 더 좋아 보인다.
+   * 2번 방법을 사용핼 때 ES6+ 문법 활용
+   * - ES6+ 문법 : `{...obj}`을 할당하면 obj의 property들을 그대로 할당함
+   * - req.session.user = { ...req.session.user, name, email, username, location };
+   */
   req.session.user = updatedUser;
 
-  // Session에 저장된 user의 data를 개별적으로 업데이트
-  // ES6+ 문법 : `{...obj}`을 할당하면 obj의 property들을 그대로 할당함
-  // req.session.user = { ...req.session.user, name, email, username, location };
-
-  // res.render("edit-profile", ...)을 써도 되지만,
-  // pageTitle 등을 전달하는 코드를 중복으로 사용하지 않기 위해 redirect
+  /* res.render("edit-profile", ...)을 써도 되지만,
+   * pageTitle 등을 전달하는 코드를 중복으로 사용하지 않기 위해 redirect
+   */
   res.redirect("/users/edit");
+};
+
+export const getChangePassword = (req, res) => {
+  /* Social login을 사용하면 password를 갖지 않으므로 password 변경 기능에 대해 예외 처리 필요
+   * 1. Session에 저장된 user data에서 `socialOnly` 값이 true라면(Social login user라면) redirect
+   * 2. Password 변경 page는 방문할 수 있지만, 기능 막아두기
+   *
+   * 1번 방법이 더 좋은 것 같다. 애초에 볼 수 없어야 함
+   * View template에서도 social only user는 password 변경 버튼을 볼 수 없는게 좋을 것
+   */
+  if (req.session.user.socialOnly) {
+    return res.redirect("/");
+  }
+  res.render("users/change-password", { pageTitle: "Change Password" });
+};
+export const postChangePassword = async (req, res) => {
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { oldPassword, newPassword, newPasswordConfirmation },
+  } = req;
+
+  const user = await User.findById(_id);
+
+  /* 현재 password가 일치하지 않으면 error
+   * Status code를 400으로 보내서 브라우저에게 요청이 실패했다는 것을 명시적으로 알린다.
+   */
+  const ok = await bcrypt.compare(oldPassword, user.password);
+  if (!ok) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The current password is incorrect.",
+    });
+  }
+
+  /* 변경하려는 password가 confirmation과 일치하지 않으면 error
+   * Status code도 4xx으로 보내서 브라우저가 자동으로 password 저장 기능을 활성화하지 못하게 막는다.
+   */
+  if (newPassword !== newPasswordConfirmation) {
+    return res.status(400).render("users/change-password", {
+      pageTitle: "Change Password",
+      errorMessage: "The password does not match the confirmation.",
+    });
+  }
+
+  /* [ Password update ]
+   * User schema에 등록한 pre `save` middleware에서 raw password를 hashing해서 저장
+   * 1. `User.create({})` 사용하면 내부적으로 `save` trigger
+   * 2. `save()`를 명시적으로 호출해서 trigger
+   *
+   * 여기서는 session에 저장된 user data로부터 `_id`를 가져올 수 있으므로
+   * user database에서 `_id`로 object를 가져와서 password 업데이트 후 명시적으로 저장한다. (2번)
+   *
+   * Password 변경 후 logout 시키면서 기존 session은 destroy 되므로 session.user는 갱신하지 않아도 된다.
+   */
+  user.password = newPassword;
+  await user.save();
+
+  // send notification
+
+  /* Password 변경에 성공하면 logout 시킨 후 다시 로그인하게 만들기
+   */
+  res.redirect("/users/logout");
 };
 
 export const see = (req, res) => {
