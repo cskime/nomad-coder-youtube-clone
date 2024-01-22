@@ -1,3 +1,5 @@
+import multer from "multer";
+
 export const localsMiddleware = (req, res, next) => {
   // Pug template에서 사용할 전역 property 설정
   res.locals.isLoggedIn = req.session.isLoggedIn;
@@ -24,3 +26,8 @@ export const publicOnlyMiddleware = (req, res, next) => {
   }
   res.redirect("/");
 };
+
+/* [ Multer ]
+ * `dest` : 사용자로부터 받은 file을 저장할 경로 (hard drive)
+ */
+export const uploadFilesMiddleware = multer({ dest: "uploads/" });

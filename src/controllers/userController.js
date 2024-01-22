@@ -168,10 +168,10 @@ export const finishGitHubLogin = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const user = await User.findOne({ email: emailObject.email });
+    let user = await User.findOne({ email: emailObject.email });
     if (!user) {
       // create an account
-      const user = await User.create({
+      user = await User.create({
         email: emailObject.email,
         username: userData.login,
         password: "",
@@ -202,10 +202,13 @@ export const postEdit = async (req, res) => {
   // ES6+ pattenr matching 문법
   const {
     session: {
-      user: { _id },
+      user: { _id, avatarUrl },
     },
     body: { name, email, username, location },
+    file,
   } = req;
+
+  console.log(file ? file.path : avatarUrl);
 
   /* 변경하려는 email, username을 다른 user가 이미 사용하고 있다면 변경할 수 없게 막는다.
    * Database 검색 시 자기 자신은 제외하도록 query
@@ -215,11 +218,10 @@ export const postEdit = async (req, res) => {
    * 해당 query의 검색 결과가 존재한다면 다른 page로 redirect
    */
   const isExists = await User.exists({
-    // $nor: [{ _id }],
-    $or: [{ username }, { email }, { _id: { $ne: _id } }],
+    $nor: [{ _id }],
+    $or: [{ username }, { email }],
   });
   if (isExists) {
-    console.log("isExists :", isExists);
     return res.redirect("/users/edit");
   }
 
@@ -229,7 +231,13 @@ export const postEdit = async (req, res) => {
    */
   const updatedUser = await User.findByIdAndUpdate(
     _id,
-    { name, email, username, location },
+    {
+      avatarUrl: file ? file.path : avatarUrl,
+      name,
+      email,
+      username,
+      location,
+    },
     { new: true }
   );
 
@@ -263,6 +271,7 @@ export const getChangePassword = (req, res) => {
   }
   res.render("users/change-password", { pageTitle: "Change Password" });
 };
+
 export const postChangePassword = async (req, res) => {
   const {
     session: {

@@ -37,6 +37,8 @@ app.use(sessionMiddleware);
 
 app.use(localsMiddleware);
 
+/* Static files serving */
+app.use("/uploads", express.static("uploads"));
 app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
