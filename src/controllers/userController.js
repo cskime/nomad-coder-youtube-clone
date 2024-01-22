@@ -194,8 +194,53 @@ export const logout = (req, res) => {
   res.redirect("/");
 };
 
-export const edit = (req, res) => {
-  res.send("Edit User");
+export const getEdit = (req, res) => {
+  res.render("edit-profile", { pageTitle: "Edit Profile" });
+};
+
+export const postEdit = async (req, res) => {
+  // ES6+ pattenr matching 문법
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { name, email, username, location },
+  } = req;
+
+  // 변경하려는 email, username 등이 이미 존재한다면 변경할 수 없게 막는다.
+  // body에 있는 email, username이 session에 저장된 것과 같다면 자기 자신의 정보
+  // 다르다면, 다른 user들의 email, username과 비교해 본다.
+  // 중복된다면 다시 edit page로 redirect
+
+  const isExists = await User.exists({
+    // $nor: [{ _id }],
+    $or: [{ username }, { email }, { _id: { $ne: _id } }],
+  });
+  if (isExists) {
+    console.log("isExists :", isExists);
+    return res.redirect("/users/edit");
+  }
+
+  // Database에 저장된 User에 새 정보 업데이트
+  // 이 때, `findByIdAndUpdate`는 update 이전의 객체를 반환하므로
+  // `{ new: true }` option을 추가해야 updated user를 가져올 수 있다.
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    { name, email, username, location },
+    { new: true }
+  );
+
+  // Database의 user와 session에 저장된 user는 독립된 객체
+  // Updated user data를 session에도 갱신시켜 주어야 한다.
+  req.session.user = updatedUser;
+
+  // Session에 저장된 user의 data를 개별적으로 업데이트
+  // ES6+ 문법 : `{...obj}`을 할당하면 obj의 property들을 그대로 할당함
+  // req.session.user = { ...req.session.user, name, email, username, location };
+
+  // res.render("edit-profile", ...)을 써도 되지만,
+  // pageTitle 등을 전달하는 코드를 중복으로 사용하지 않기 위해 redirect
+  res.redirect("/users/edit");
 };
 
 export const see = (req, res) => {

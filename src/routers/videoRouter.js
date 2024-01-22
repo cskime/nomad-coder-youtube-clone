@@ -7,6 +7,7 @@ import {
   postUpload,
   deleteVideo,
 } from "../controllers/videoController";
+import { protectorMiddleware } from "../middlewares";
 
 const videoRouter = express.Router();
 
@@ -27,13 +28,24 @@ videoRouter.get("/:id([0-9a-f]{24})", watch);
   - to-be:
     videoRouter.route("/path").get(getController).post(postController);
 */
-videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
-videoRouter.route("/:id([0-9a-f]{24})/delete").get(deleteVideo);
+videoRouter
+  .route("/:id([0-9a-f]{24})/edit")
+  .all(protectorMiddleware)
+  .get(getEdit)
+  .post(postEdit);
+videoRouter
+  .route("/:id([0-9a-f]{24})/delete")
+  .all(protectorMiddleware)
+  .get(deleteVideo);
 
 /* [ Route 순서 ]
   - Regex를 사용하지 않을 경우, `:id` parameter를 사용하는 route가 위에 있다면 `upload`도 regex에 매칭됨
   - 따라서, video upload page로 가지 못하고 항상 watch page로 이동하게 됨
   - URL parameter가 없는 routing code를 가장 위로 옮겨도 해결되지만, 안전하지 않으므로 regex를 사용하는 방법 권장
  */
-videoRouter.route("/upload").get(getUpload).post(postUpload);
+videoRouter
+  .route("/upload")
+  .all(protectorMiddleware)
+  .get(getUpload)
+  .post(postUpload);
 export default videoRouter;
