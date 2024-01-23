@@ -1,3 +1,4 @@
+import User from "../models/User";
 import Video from "../models/Video";
 
 export const home = async (req, res) => {
@@ -24,7 +25,10 @@ export const search = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id);
+  const video = await Video.findById(id).populate("owner");
+
+  /* */
+  // const owner = await User.findById(video.owner);
 
   /* [ 유효하지 않은 id를 입력한 경우 ]
     - id가 URL에 있기 때문에, id를 바꿔서 입력할 수도 있음
@@ -105,8 +109,13 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
-  const file = req.file;
-  const { title, description, hashtags } = req.body;
+  const {
+    session: {
+      user: { _id },
+    },
+    body: { title, description, hashtags },
+    file,
+  } = req;
 
   /*  [ Create New Model ]
       - New data 생성 과정
@@ -127,10 +136,11 @@ export const postUpload = async (req, res) => {
   // await video.save();
 
   try {
-    await Video.create({
+    const newVideo = await Video.create({
       title,
-      fileUrl: file.path,
       description,
+      fileUrl: file.path,
+      owner: _id,
       createdAt: Date.now(),
 
       /*  [ Hashtag Formatting 분리 ]
@@ -139,7 +149,7 @@ export const postUpload = async (req, res) => {
           - 중복 코드를 제거하기 위해 formatting code를 분리한다.
           - Model의 schema 정의 단계에서 전처리 코드를 미리 등록해 두고 호출되도록 만듦 (Video.js 참고)
       */
-      // hashtags: hashtags.split(",").map((word) => `#${word}`), // 분리 전
+      // hashtags: hashtags.split(",").map((word) => `#${wor d}`), // 분리 전
       // hashtags, // Middleware 사용
       // hashtags: formatHashtags(hashtags), // 일반 function 사용
       hashtags: Video.formatHashtags(hashtags), // Static function 사용
@@ -152,6 +162,9 @@ export const postUpload = async (req, res) => {
       //   rating: 0,
       // },
     });
+    const user = await User.findById(_id);
+    user.videos.push(newVideo._id);
+    user.save();
     res.redirect("/");
   } catch (error) {
     console.log(error);

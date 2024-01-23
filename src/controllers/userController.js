@@ -1,5 +1,6 @@
 import User from "../models/User";
 import bcrypt from "bcrypt";
+import Video from "../models/Video";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 export const postJoin = async (req, res) => {
@@ -327,6 +328,21 @@ export const postChangePassword = async (req, res) => {
   res.redirect("/users/logout");
 };
 
-export const see = (req, res) => {
-  res.send("See User");
+export const see = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id).populate("videos");
+
+  /* User profile은 누구나 볼 수 있는 public page
+   * 잘못된 user id를 사용해서 접근하면 404 page를 보여준다.
+   */
+  if (!user) {
+    return res.status(404).render("404", { pageTitle: "User not found." });
+  }
+
+  // const videos = await Video.find({ owner: id });
+  res.render("users/profile", {
+    pageTitle: `${user.name}'s Profile`,
+    user,
+    // videos,
+  });
 };

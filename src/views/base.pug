@@ -13,12 +13,12 @@ html(lang="ko")
                     if isLoggedIn
                         li 
                             a(href="/videos/upload") Upload Video
+                        li 
+                            a(href=`/users/${user._id}`) My Profile
                         li
                             a(href="/users/edit") Edit Profile
                         li 
                             a(href="/users/logout") Log Out
-                        li 
-                            a(href="/my-profile") #{user.name}'s Profile
                     else
                         li 
                             a(href="/join") Join

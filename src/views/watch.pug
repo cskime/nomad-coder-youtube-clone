@@ -5,13 +5,17 @@ block content
     div 
         p=video.description
         small=video.createdAt
+    div 
+        small Uploaded by 
+            a(href=`/users/${video.owner._id}`) #{video.owner.name}
 
-    //- [ Absolute vs. Relative URL in href ]
-    //- `/`을 붙이면 absolute url로 동작
-    //- Root : localhost:4000
-    //- Current : localhost:4000/videos/1
-    //- `href="/edit" : `{ROOT}/edit`으로 이동
-    //- `href="edit" : `{CURRENT}/edit`으로 이동
-    a(href=`${video.id}/edit`) Edit Video &rarr;
-    br
-    a(href=`${video.id}/delete`) Delete Video &rarr;
+    if String(video.owner._id) === String(user._id)
+        //- [ Absolute vs. Relative URL in href ]
+        //- `/`을 붙이면 absolute url로 동작
+        //- Root : localhost:4000
+        //- Current : localhost:4000/videos/1
+        //- `href="/edit" : `{ROOT}/edit`으로 이동
+        //- `href="edit" : `{CURRENT}/edit`으로 이동
+        a(href=`${video.id}/edit`) Edit Video &rarr;
+        br
+        a(href=`${video.id}/delete`) Delete Video &rarr;

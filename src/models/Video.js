@@ -10,6 +10,18 @@ const videoSchema = new mongoose.Schema({
     views: { type: Number, required: true, default: 0 },
     rating: { type: Number, required: true, default: 0 },
   },
+
+  /* [ Data type ]
+   * - MongoDB에서 제공하는 `_id`는 `ObjectId` type
+   * - 이 type은 기본으로 제공되는 type이 아니므로 직접 찾아 들어가야 한다.
+   * - `mongoose.Schema.Types.ObjectId`
+   *
+   * [ Reference ]
+   * - mongoose에게 owner에 _id를 저장하겠다고 알려주어야 함
+   * - 어떤 model과 연결할지 알려주어야 함
+   * - `Video` model은 `User` model과 연결될 것이므로 `ref: "User"`
+   */
+  owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
 });
 
 /*  [ Hashtag formatting 코드를 재사용하기 위한 방법 ]
