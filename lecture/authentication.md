@@ -49,6 +49,20 @@
     this.password = await bcrypt.hash(this.password, 5);
   });
   ```
+- Password 중복 hashing 방지
+
+  - `save()` method가 실행될 때 마다 hashing middleware가 실행됨
+  - Video를 upload하거나 username을 변경하는 등 password를 수정하지 않았을 때에도 실행됨
+  - 이 때, hashing된 password가 다시 hashing되는 문제가 있음
+  - Mongoose의 `isModified(field)`로 **password가 변경되었을 때만** hashing 하도록 개선
+    ```js
+    userSchema.pre("save", async function () {
+      // 이 함수의 this는 저장하려는 user object instance를 가리킴
+      if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 5);
+      }
+    });
+    ```
 
 ## Unique 값의 중복 저장 방지
 

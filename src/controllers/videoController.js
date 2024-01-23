@@ -47,15 +47,29 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const video = await Video.findById(id);
   if (!video) {
     return res.status(404).render("404", { pageTitle: "Video not found." });
   }
+
+  // Video를 upload한 사용자가 아니면 home으로 redirect
+  // video.owner는 `ObjectId` type인 object
+  // req.session.user._id는 `string` type인 value
+  if (String(video.owner) !== req.session.user._id) {
+    return res.status(403).redirect("/");
+  }
+
   return res.render("edit", { pageTitle: `Edit ${video.title}`, video });
 };
 
 export const postEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.sesion;
   const { title, description, hashtags } = req.body;
 
   /*  [ Array database 테스트 ]
@@ -89,9 +103,13 @@ export const postEdit = async (req, res) => {
   // await video.save();
 
   // 특정 id에 해당하는 video data가 존재하는지 확인
-  const isExist = await Video.exists({ _id: id });
-  if (!isExist) {
+  const video = await Video.exists({ _id: id });
+  if (!video) {
     return res.render("404", { pageTitle: "Video not found." });
+  }
+
+  if (String(video.owner) !== _id) {
+    return res.status(403).redirect("/");
   }
 
   // `id`와 매칭되는 data를 찾아서 `updateObject`로 update할 field 및 value 전달
@@ -177,6 +195,18 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.sesion;
+
+  const video = await Video.findById(id);
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+
+  if (String(video.owner) !== _id) {
+    return res.status(403).redirect("/");
+  }
   await Video.findByIdAndDelete(id);
   res.redirect("/");
 };
