@@ -1,97 +1,211 @@
 # Summary
 
-강의에서 사용한 API 및 개념 요약 정리
+## Table of Contents
 
-## Node.JS & npm
+1. node.js & npm
+2. Express
+3. Pug
+   - HTML template
+   - Input value
+   - Use global variable (`res.locals`)
+4. MongoDB
+   - NoSQL database
+5. Mongoose
+   - Integrates MongoDB into nodeJS app
+6. Login/Logout
+   - session, cookie, token
+   - express-session
+   - Login
+   - Logout
+7. OAuth login (Social login)
+   - GitHub login
+   - Connect GitHub account with existing account
+8. File
+   - `multer`
+   - Static files serving
+9. Appendix A. Import & Export Javascript Module
+   - Javascript file is a isolated module.
+   - To use js code from another file, the code has to be exported.
+   - Export codes
+     - `export` : Export each variables and functions.
+     - `export default` : Export only one variable or function.
+   - Import codes
+     - `import name from "path"` : Import the default exporting code from a file
+     - `import { a, b, c } from "path"` : Import multiple exporting codes from a file
+     - `import package from "package"` : Import from package
+     - When it imports a file which has a default exporting code, the name can be whatever.
+     - If importing file has a multiple exporting codes, the name has to the same.
+10. Appendix B. Some javascript features
+
+## node.js & npm
 
 - node.js : Javascript runtime environment based on V8 engine.
 - npm : node.js package manager
 - `package.json`
   - `scripts` : custom script executed by `npm` command
-  - `dependencies` : External packages to run a node app
-  - `devDependencies` : External packages to development
-- `node_modules` : Files of installed packages
-- Packages
-  - Express : Server framework
-  - morgan : HTTP request logger middleware for node.js
-  - Pug : HTML template language
-  - Babel : Transfile latest javascript features to under ES5
-    - `@babel/core` : Babel core
-    - `@babel/node` : Babel for node.js (It uses a `babel-node` command instead of `node`)
-    - `@babel/preset-env` : Transfile latest Javascript features to older one.(under ES5)
-  - Nodemon : Monitoring codes and auto restart node app when detect some changes
-  - Prettier : Code formatter
-- Commands
-  - `node {file}.js` : Execute javascript file
-  - `npm init` : Initialize node.js application in current directory (creates a `package.json`)
-  - `npm run {script}` : Run a script which is wrote in `package.json`
-  - `npm i/install {package}` : Install node.js package
-  - `npm i {package} --save-dev` : Install node.js pakcage as a `devDependencies`
-
-### Export and Import Javascript
-
-- Javascript file is a isolated module.
-- To use js code from another file, the code has to be exported.
-- Export codes
-  - `export` : Export each variables and functions.
-  - `export default` : Export only one variable or function.
-- Import codes
-  - `import name from "path"` : Import the default exporting code from a file
-  - `import { a, b, c } from "path"` : Import multiple exporting codes from a file
-  - `import package from "package"` : Import from package
-  - When it imports a file which has a default exporting code, the name can be whatever.
-  - If importing file has a multiple exporting codes, the name has to the same.
+  - `dependencies` : dependencies which are installed via `npm i package`
+    - `express` : Server framework
+    - `morgan` : HTTP request logger middleware for node.js
+    - `pug` : HTML template
+    - `bcrypt` : Password Encryption
+    - `mongoose` : MongoDB for node.js
+    - `express-session` : Session in express
+    - `connect-mongo` : Persistence for express-session
+    - `dotenv` : add keys in `.env` to environment (`process.env`)
+  - `devDependencies` : dependencies which are installed via `npm i package --save-dev`
+    - `babel` : Transfile latest javascript features to under ES5
+      - `@babel/core` : Babel core
+      - `@babel/node` : Babel for node.js (It uses a `babel-node` command instead of `node`)
+      - `@babel/preset-env` : Transfile latest Javascript features to older one.(under ES5)
+    - `nodemon` : Monitoring codes and auto restart node app when detect some changes
 
 ## Express
 
-- `express()` : create express app.
-- `listen(port, callback?)` : Binds and listens for connections on the specified host and port.
-- Middlewares
-  - `use(path?, middlewares...)` : Mount middlewares at the specified path.
-- Setting
-  - `set(name, value)` : Assigns setting name to value.
-    - Certain names can be used to configure the behavior of the server.
-    - e.g. `view engine`, `views`
-  - `get(name)` : Returns the value of name app setting.
-  - [More names](https://expressjs.com/en/4x/api.html#app.settings.table)
-- Routing
-  - `METHOD(path, callbacks...)` : Routes HTTP GET/POST requests to the specified path
-  - `route(path)` : Returns an instance of a single route
-    - `METHOD(middlewares...?)` : Handle HTTP GET/POST requests to the specified middlewares
-  - These methods are also implemented
-- Request
-  - `request.params` : It's an object containing properties mapped to the named route "parameters".
-  - `request.query` : It's an object containing a property for each query string parameter.
-  - `request.body` : It contains key-value pairs of data submitted in the request body.
-    - default `undefined`
-    - It's populated when you use body parsing middleware.
-    - e.g. `express.json()`, `express.urlencoded()`
-- Response
-  - `response.end()` : Ends the response process.
-  - `response.send(body)` : Sends the HTTP response with the body parameter
-    - a `Buffer` object
-    - a `String`
-    - an object
-    - a `Boolean`
-    - an `Array`.
-  - `response.render(view, localVariables?, callback?)` : Renders a view and sends the rendered HTML string to the client.
-  - `response.redirect(status?, path)` : Redirects to the URL derived from the specified path, status.
-- URL encoding
-  - `express.urlencoded(options?)` : Parses incoming requests with urlencoded payloads.
-    - `extended` option : Allows to choose between parsing the URL-encoded data
+```js
+import express from "express";
+
+/* Create app */
+const app = express();
+
+/* Start listening
+ * Binds and listens for connections on the specified host and port.
+ */
+const PORT = 4000;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT} 🚀🚀`);
+});
+```
+
+### App Settings
+
+- Store any value
+  ```js
+  app.set("title", "My Site");
+  app.get("title"); // "My Site"
+  ```
+- Configure the behavior of the server
+  ```js
+  app.set("view engine", "pug");
+  app.set("views", process.cwd() + "/src/views");
+  ```
+  - `view engine` : The default engine extension
+  - `views` : A directory for the application's views
+  - [More properties](https://expressjs.com/en/4x/api.html#app.settings.table)
+
+### Middlewares
+
+- Middleware
+  - Functions that have access to the request(`req`), response(`res`) object and the `next()` middleware function
+    ```js
+    const middleware = (req, res, next) => {
+      next(); // execute a next middleware
+    };
+    ```
+  - Execute any code before the cycle ends
+  - Make changes to the request and the response objects
+  - Call the next middleware in the stack (`next()`)
+  - End the request-response cycle
+    ```js
+    // The last middleware doesn't need a next() middleware function
+    const middleware = (req, res) => {
+      res.end(); // end cycle
+    };
+    ```
+- Mounts the specified middlewares at the specified path
+- Application-level middleware
+  ```js
+  const app = express();
+  app.use("/users", middleware1, middleware2, middleware3);
+  app.use(middleware); // default route to root path (`/`)
+  ```
+- Router-level middleware
+  ```js
+  const router = express.Router();
+  router.use("/users", middleware1, middleware2, middleware3);
+  router.use(middleware);
+  ```
+- Built-in middlewares
+  - `express.urlencoded(options)` : Parses incoming requests with urlencoded payloads(the data in the body)
+    ```js
+    app.use(express.urlencoded({ extended: true }));
+    ```
+    - `extended` option : Allows to choose between a parsing URL-encoded data libraries
       - `{ extended: true }` : Uses the `querystring` library
       - `{ extended: false }` : Uses the `qs` library
+    - Use this when you
 
 ### Router
 
-- Router offers a method to make a structured architecture with structured URLs.
-- `express.Router()` : creates a new router object ([Router docs](https://expressjs.com/en/4x/api.html#router))
-- Some of the express application APIs is also implemented in Router.
-  - `METHOD(path, callbacks...)` : Routes HTTP GET/POST requests to the specified path
-  - `route(path)` : Returns an instance of a single route
-    - `METHOD(middlewares...?)` : Handle HTTP GET/POST requests to the specified middlewares
-  - `use(middlewares...)`
-  - `use(path, middlewares...)`
+- An isolated instance of middleware and routes
+- It's a "mini-application", capable only of performing middleware and routing functions.
+  ```js
+  const userRouter = express.Router();
+  const editController = (req, res) => res.send("Edit User Profile");
+  userRouter.get("/edit", someMiddleware, editController);
+  app.use("/users", userRouter);
+  ```
+
+### Request
+
+- `req.params` : It's an object containing properties mapped to the **named route parameters**
+  ```js
+  // Request URL: http://localhost:4000/users/34/books/8989
+  app.get("/users/:userId/books/:bookId", (req, res) => {
+    req.send(req.params); // { "userId": "34", "bookId": "8989" }
+  });
+  ```
+- `req.query` : It's an object containing a property for each **query string parameter** in the route
+  ```js
+  // Request URL: http://localhost:4000/users?userId=34&bookId=8989
+  app.get("/users/:userId/books/:bookId", (req, res) => {
+    req.send(req.query); // { "userId": "34", "bookId": "8989" }
+  });
+  ```
+- `req.body` : It contains key-value pairs of data submitted in the **request body**
+  ```js
+  app.use(express.json()); // for parsing application/json
+  app.post("/profile", (req, res, next) => {
+    res.json(req.body); // { "name": "Chamsol Kim", "email": "kcsol1005@gmail.com" }
+  });
+  ```
+  - It's populated when you use body parsing middleware.
+    - `express.json()` : for parsing `application/json`
+    - `express.urlencoded()` : for parsing `application/x-ww-form-urlencoded`
+
+### Response
+
+- `res.end()` : Ends the response process.
+  ```js
+  res.end();
+  ```
+- `res.send(body)` : Sends the HTTP response
+  ```js
+  res.send(Buffer.from("whoop")); // Send a Buffer object
+  res.send({ some: "json" }); // Send an object
+  res.send("<p>some html</p>"); // Send a String
+  res.send([1, 2, 3]); // Send an array
+  ```
+- `res.render(view, locals?, callback?)` : Renders a view and sends the rendered HTML string to the client.
+  ```js
+  res.render("index");
+  res.render(
+    "index",
+    { name: "Kim" }, // The `index` view can uses `name` vairable inside
+    (error, html) => res.send(html)
+  );
+  await res.render("index", { name: "Kim" }); // Use a Promise instead of callback function
+  ```
+- `res.redirect(status?, path)` : Redirects to the URL derived from the specified path, status.
+  ```js
+  res.redirect("post/new"); // Redirects to relative path
+  res.redirect("/admin"); // Redirects to absolute path
+  res.redirect("https://example.com"); // Redirects to a fully-qualified URL
+  res.redirect(301, "https://example.com"); // Redirects with status code
+  ```
+- `res.status(code)` : Sets the HTTP status for the response
+  ```js
+  res.status(400).end(); // chainable
+  ```
 
 ## Pug
 
@@ -167,3 +281,13 @@ HTML template language
 - View : HTML or templates
 - Controller : Middlewares or handlers to handle request and send a response.
 - Router : Route HTTP requests to controller
+
+## Appendix. Route(Path) Parameter vs Query Parameter
+
+- Route Parameter
+  - 특정 자원에 접근하는 URL에 가변 요소를 만드는 방법
+  - 유일한 값을 식별하는 용도
+- Query Parameter
+  - 같은 URL에 대해 조건을 주는 방법
+  - 데이터를 선택적으로 처리하기 위한 옵션
+- [참고](https://velog.io/@juno97/API-Path-parameter-VS-Query-Parameter-%EA%B8%B0%EB%A1%9D%EC%9A%A9)
