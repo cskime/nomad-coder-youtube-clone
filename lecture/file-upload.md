@@ -4,7 +4,8 @@
 
 ## Upload to server
 
-- `multer`는 `multipart/form-data`가 아니면 upload하지 않으므로 `<form>`에 `enctype` 지정
+- `multer`로 file을 upload하려면 encoding type이 `multipart/form-data`이어야 함
+- `<form>`의 `enctype` attribute를 `multipart/form-data`로 설정
   ```html
   <form method="POST" enctype="multipart/form-data">
     <input type="file" name="avatar" accept="image/*" />
@@ -99,3 +100,20 @@
 
 - Image를 서버에 직접 저장하면, 서버가 죽었을 때 파일들이 날아가므로 좋은 방법이 아님
 - File들을 서버 외 다른 곳에 저장해야 서버가 죽었다 재시작해도 file들을 안전하게 보관할 수 있다.
+
+## File Size 제한
+
+- Multer Middleware를 만들 때 `limits` 옵션에 `fileSize` 지정 (bytes)
+  ```js
+  // avatar image와 video를 별도 directory에 저장하기 위해 middleware 분리
+  export const uploadAvatar = multer({
+    dest: "uploads/avatars/",
+    limits: { fileSize: 1 * 1024 * 1024 }, // 1MB 업로드 제한
+  });
+  export const uploadVideo = multer({
+    dest: "uploads/videos/",
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 업로드 제한
+  });
+  ```
+- 지정한 file size보다 큰 이미지를 업로드하면 `MulterError: File too large` error 발생
+  - 이 때 필요한 response 구현

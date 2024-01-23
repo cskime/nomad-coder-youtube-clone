@@ -3,11 +3,13 @@ extends base
 block content
     if errorMessage
         span=errorMessage 
-    form(method="POST")
+    form(method="POST" enctype="multipart/form-data")
         //- Video model에서 title, description에 적용한 length 옵션 sync
         //- Form은 사용자를 위한 것
         //- Model은 DB를 위한 것 -> 해킹되었을 때에도 보호할 수 있도록 database에도 제한을 걸어야 함
         //- 비정상적인 data가 database에 업로드되는 것 자체를 막기 위함
+        label(for="video") Video File
+        input(type="file" accpet="video/*" id="video" name="video" required)
         input(placeholder="Title", required, type="text", name="title" maxLength=80)
         input(placeholder="Description", required, type="text", name="description" minLength=20)
         input(placeholder="Hashtags, separated by comma.", required, type="text", name="hashtags")

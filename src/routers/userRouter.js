@@ -12,7 +12,7 @@ import {
 import {
   protectorMiddleware,
   publicOnlyMiddleware,
-  uploadFilesMiddleware,
+  uploadAvatar,
 } from "../middlewares";
 
 const userRouter = express.Router();
@@ -34,7 +34,7 @@ userRouter
    * 3. Multer middleware는 upload된 file을 처리한 뒤 controller(`postEdit`)로 file 전달
    *    - Middleware가 file을 request에 추가해 줌 (`req.file`)
    */
-  .post(uploadFilesMiddleware.single("avatar"), postEdit);
+  .post(uploadAvatar.single("avatar"), postEdit);
 userRouter
   .route("/change-password")
   .all(protectorMiddleware)

@@ -105,7 +105,7 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
-  // add a video to the videos array
+  const file = req.file;
   const { title, description, hashtags } = req.body;
 
   /*  [ Create New Model ]
@@ -129,6 +129,7 @@ export const postUpload = async (req, res) => {
   try {
     await Video.create({
       title,
+      fileUrl: file.path,
       description,
       createdAt: Date.now(),
 

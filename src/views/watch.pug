@@ -1,8 +1,10 @@
 extends base.pug
 
 block content
-    p=video.description
-    small=video.createdAt
+    video(src="/" + video.fileUrl, controls)
+    div 
+        p=video.description
+        small=video.createdAt
 
     //- [ Absolute vs. Relative URL in href ]
     //- `/`을 붙이면 absolute url로 동작
@@ -10,7 +12,6 @@ block content
     //- Current : localhost:4000/videos/1
     //- `href="/edit" : `{ROOT}/edit`으로 이동
     //- `href="edit" : `{CURRENT}/edit`으로 이동
-    br
     a(href=`${video.id}/edit`) Edit Video &rarr;
     br
     a(href=`${video.id}/delete`) Delete Video &rarr;
