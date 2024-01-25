@@ -6,13 +6,16 @@
 - Frontend에서는 webpack으로 같은 목적을 달성함. 즉, **브라우저 호환 코드로 변환**해 주는 것
 - React 등 대부분의 프레임워크에는 webpack이 내장되어 있으므로 실제로 webpack을 다룰 일은 없을 수도 있음
 
-## Webpack 개발 흐름
+## Webpack을 사용한 개발 흐름
 
-1. Backend code 개발
-2. Frontend(client)에서 사용할 code 작성 (Javascript, CSS, SCSS 등)
-3. Webpack으로 client code 압축 및 변환 (static files)
-4. Backend에서 만든 HTML view에서 static file을 import (CSS link, Javascript script 등)
-5. Client에서 server가 rendering한 page를 요청하면 static code에 접근 (CSS 적용, Javascript file 실행 등)
+1. Frontend(client)를 위한 code 개발 (Javascript, CSS(or SCSS), assets)
+2. Webpack으로 client code 압축 및 변환 (static files)
+   - `webpack.config.js`에서 `watch` 속성을 `true`로 설정하면 자동으로 webpack 실행
+   - File 수정 후 webpack을 일일이 실행하지 않아도 됨
+3. HTML view에서 static file에 접근
+   - Link the `.css` files
+   - Import the `.js` files
+4. Client에서 server가 rendering한 page를 요청하면 static code에 접근 (CSS 적용, Javascript file 실행 등)
 
 ## 설치
 
