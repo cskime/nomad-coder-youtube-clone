@@ -12,13 +12,14 @@
 
 ## Notes
 
-- [ ] Node.js & npm
-- [ ] Express
-- [ ] Pug 
-- [ ] [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/mongodb-mongoose.md)
-- [ ] Password encryption
-- [ ] Login and session
-- [ ] File upload
-- [ ] [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
-- [ ] Nodemon
-- [ ] Babel
+- Node.js & npm
+- Express
+- Pug 
+- [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/mongodb-mongoose.md)
+- Password encryption
+- Login and session
+- File upload
+- [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
+- [Nodemon](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodemon.md)
+
+- Babel
