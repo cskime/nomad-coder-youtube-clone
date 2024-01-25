@@ -21,5 +21,4 @@
 - File upload
 - [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
 - [Nodemon](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodemon.md)
-
 - Babel
