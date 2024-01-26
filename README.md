@@ -6,15 +6,16 @@
 ## Skills
 
 - Javascript (ES6+)
-- Pug
 - Node.js, Express
-- MongoDB
+- Pug
+- MongoDB, Mongoose
+- Webpack
 
 ## Notes
 
-- Node.js & npm
+- [Node.js & npm](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodejs-npm.md)
 - Express
-- Pug 
+- Pug
 - [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/mongodb-mongoose.md)
 - Password encryption
 - Login and session
