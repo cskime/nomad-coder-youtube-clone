@@ -173,7 +173,8 @@
 
 ### Queries
 
-- MongoDB의 좋은 query 성능을 사용할 수 있음
+- Mongoose의 find, update, delete 등 method는 `Query` type을 반환한다.
+- Mongoose의 `Query` 객체를 통해 성능이 좋은 MongoDB의 query를 사용할 수 있다.
 - `sort(arg)` : database에서 가져온 query를 arg로 전달한 조건에 따라 정렬해서 반환
   ```js
   // { 정렬할 기준 field: "asc" or "desc" }
@@ -186,12 +187,48 @@
   const videos = Video.find({}).exec();
   ```
   - `exec()`을 실행하지 않아도 동작에는 차이가 없다.
+  - `Promise`를 반환하여 비동기 코드를 작성할 수 있다.
+  - `async`, `await`을 사용한다면 `Promise`를 사용할 필요가 없으므로 생략 가능
 
 ### Operators
 
-- `$regex`
-- `$or`
-- `$nor`
+- Mongoose에서 query를 보낼 때 MongoDB의 operator를 사용할 수 있다.
+- MongoDB에서 지원하는 operator
+  - `$regex` : Query에서 값에 대한 regular expression pattern matching 지원
+    ```js
+    const videos = await Video.find({
+      title: { $regex: new RegExp(`^${keyword}`, "i") },
+    });
+    ```
+    -
+  - `$or` : 둘 이상의 expression들에 `OR` operator 적용, 최소 1개의 expression이 성공하는 document 선택
+    ```js
+    const isExists = await User.exists({
+      // username, email 중 하나라도 일치하는 document가 존재하는지
+      $or: [{ username }, { email }],
+    });
+    ```
+  - `$nor` : 둘 이상의 expression들에 `NOR` operator 적용, expression들이 **모두 실패하는** document 선택
+    ```js
+    const isExists = await User.exists({
+      // id가 같지 않은 document 선택
+      $nor: [{ _id }],
+    });
+    ```
+  - `$ne` : 특정 field의 값이 value가 아닌 document 선택 (**not equal to** the value)
+    ```js
+    const isExists = await Video.exists({
+      // id가 같지 않은 document 선택
+      title: { $ne: "test" }, // title이 "test"가 아닌 document가 존재하는지
+    });
+    ```
+  - Logical query operator(`$or`, `$nor`)는 field level에 적용
+  - Comparison query operator(`$ne`)는 value level에 적용
+- Mongoose는 `Query` 객체에서 MongoDB의 operator를 실행할 수 있는 Javascript method로 제공한다.
+  ```js
+  const isExists = await User.find().nor([{ _id }]);
+  const isExists = await User.find().or([{ _id }]);
+  ```
 
 ### Middlewares
 
