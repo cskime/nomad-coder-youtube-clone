@@ -25,3 +25,16 @@
     - `src/client/*` : Client를 위한 file들은 수정해도 server app과 무관
     - `assets/*` : Webpack에 의해 생성된 static file들은 server app과 무관
   - `exec` : `nodemon` 명령어가 실행할 script
+
+---
+
+- `nodemon` : babel이 파일이 수정되는 것을 감지하여 재시작해 줌
+
+  - 설치 : `npm i nodemon --save-dev`
+  - `babel-node` 명령어와 함께 사용 : `nodemon --exec babel-node index.js`
+  - `nodemon`과 함께 run하면 실행 후 console이 종료되지 않고, 파일을 수정한 뒤 저장하면 다시 실행됨
+  - 파일을 수정할 때 마다 `npm run dev`를 계속 실행하지 안항도 됨
+
+  ```
+
+  ```
