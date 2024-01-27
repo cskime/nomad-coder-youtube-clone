@@ -13,10 +13,10 @@
 
 ## Notes
 
-- [Node.js & npm](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodejs-npm.md)
-- Express
+- [Node.js & npm](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/01-nodejs-npm.md)
+- [Express](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/02-express.md)
 - Pug
-- [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/mongodb-mongoose.md)
+- [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/04-mongodb-mongoose.md)
 - Password encryption
 - Login and session
 - File upload
