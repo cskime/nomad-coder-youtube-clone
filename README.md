@@ -19,8 +19,9 @@
 - [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/04-mongodb-mongoose.md)
 - [Password encryption](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/05-password.md)
 - [Session, Cookie, Token](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/06-session-cookie-token.md)
-- Login and session
+- [User Login](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/07-user-login.md)
 - File upload
-- [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
-- [Nodemon](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodemon.md)
+- [Environment Vairable](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/environment-variable.md)
 - Babel
+- [Nodemon](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/nodemon.md)
+- [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
