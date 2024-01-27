@@ -17,7 +17,7 @@
 - [Express](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/02-express.md)
 - [Pug](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/03-pug.md)
 - [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/04-mongodb-mongoose.md)
-- Password encryption
+- [Password encryption](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/05-password.md)
 - Login and session
 - File upload
 - [Webpack](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/webpack.md)
