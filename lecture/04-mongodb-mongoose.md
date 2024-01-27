@@ -1,6 +1,6 @@
 # MongoDB & Mongoose
 
-- `express-session`은 session을 memory에 저장하므로 서버가 재시작되면 이전에 생성된 session들이 초기화됨
+- Server는 별도의 저장공간 없이 메모리에 데이터를 저장하므로, server가 어떤 이유로 재시작되면 이전 데이터를 잃어버림
 - Data가 서버의 생명 주기와 독립적으로 유지될 수 있도록 외부 database에 저장
 
 ## MongoDB
