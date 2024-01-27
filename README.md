@@ -15,7 +15,7 @@
 
 - [Node.js & npm](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/01-nodejs-npm.md)
 - [Express](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/02-express.md)
-- Pug
+- [Pug](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/03-pug.md)
 - [MongoDB & Mongoose](https://github.com/cskime/nomad-coder-youtube-clone/blob/main/lecture/04-mongodb-mongoose.md)
 - Password encryption
 - Login and session
