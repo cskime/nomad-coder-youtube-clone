@@ -36,7 +36,7 @@
 - 작성해야 할 내용도 많고, 직접 만들면 실수할 수도 있으므로 template으로 생성한다.
   - 프로젝트 root에서 `npm init` 실행하면 `package.json` 파일을 만들어 줌
 
-### script
+### Script
 
 - 모든 script를 일일이 실행하지 않아도 `package.json`의 `script`에 정의한 key로 script 실행
 - 특정 script들을 조합해서 실행하는 등 복잡한 동작 가능
@@ -47,11 +47,11 @@
     - `npm run dev:server` : server 실행 script
     - `npm run dev:asset` : bundling script
 
-### Packages
+### Dependency Package
 
 - `npm` 명령어로 다른 package 설치
   - `npm install {PACKAGE_NAME}` or `npm i {PACKAGE_NAME}` : 특정 package 직접 설치
-  - `npm install` or `npm i` : 명시된 dependency를 모두 설치
+  - `npm install` or `npm i` : `dependencies` 및 `devDependencies`에 명시된 package들을 모두 설치
 - Package를 설치하면 일어나는 일
   - `package-lock.json` 파일 생성
     - 설치해야 하는 package들을 버전에 맞게 안전하게 관리해 줌

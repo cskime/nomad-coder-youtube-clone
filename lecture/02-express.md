@@ -81,30 +81,28 @@ app.listen(PORT, () => {
 
 ### Respond to request
 
-```js
-// Root path에 대한 GET request 처리
-// URL : http://localhost:{PORT}/
-app.get("/", (req, res) => {
-  res.end();
-});
-// Login path에 대한 POST request 처리
-// URL : http://localhost:{PORT}/login
-app.post("/login", (req, res) => {
-  res.send("Login Succeed");
-});
-```
-
-- Response를 반환하는 함수를 'callback == controller == middleware'라고 부른다.
-- Controller에서 `return` 생략 가능 (명시적으로 response를 반환하고 code 실행을 종료해야 할 때 사용)
-- Controller는 request 및 response 객체를 받음
-  - Request(`req`)
-    - Server가 받은 request 정보를 담은 object (client 정보, cookie, browser 정보, IP 주소 등)
-  - Response(`res`)
-    - Server에서 전달하는 response object (request에 대한 응답 결정)
-    - Response를 보내야 client에서 요청을 보낸 cycle이 종료된다.
-    - Response를 보내지 않으면 브라우저가 무한 로딩에 빠진다.
-    - `end()` : response 반환 후 즉시 연결 종료
-    - `send(message)` : response에 message를 함께 담아서 보낸 뒤 연결 종료
+- `get(path, middleware)` : GET request handling
+  ```js
+  // URL : http://localhost:{PORT}/
+  app.get("/", (req, res) => {
+    res.end();
+  });
+  ```
+- `post(path, middleware)` : POST request handling
+  ```js
+  // URL : http://localhost:{PORT}/login
+  app.post("/login", (req, res) => {
+    res.send("Login Succeed");
+  });
+  ```
+- `route(path)` : 동일한 URL에 대해 두 method로 받은 request를 동시에 처리
+  ```js
+  import express from "express";
+  const router = express.Router();
+  router.route("/some/path").get(getController).post(postController);
+  ```
+  - `get(middleware)`, `post(middleware)`로 route의 GET/POST request에 대한 middleware 별도 설정
+  -
 
 ### Request members
 
@@ -181,8 +179,14 @@ app.post("/login", (req, res) => {
   - Handler : Callback으로 실행되는 함수를 가리키는 가장 범용적인 단어. Route에 대한 요청이 들어올 때 실행되어 handler로 부를 수도 있음
   - Express에서는 공식적인 용어인 *middleware*를 사용하고, 아키텍처에 따라 response를 반환하는 함수를 *controller*로 부른다.
 - Request(`req`) 및 response(`req`) 객체와 `next()` 함수를 parameter로 받아서 필요한 코드를 실행한다.
-  - `req` 또는 `res` 객체 변경
-  - Controller가 실행되기 이전 전처리 또는 준비 단계 실행
+  - Request(`req`)
+    - Server가 받은 request 정보를 담은 object
+    - client 정보, cookie, browser 정보, IP 주소 등 저장
+  - Response(`res`)
+    - Server에서 전달하는 response object (request에 대한 응답 결정)
+    - Response를 보내야 client에서 요청을 보낸 cycle이 종료된다.
+    - Response를 보내지 않으면 브라우저가 무한 로딩에 빠진다.
+  - `req` 또는 `res` 객체를 변경하거나 controller가 실행되기 이전 전처리 또는 준비 단계 실행
 - Request, response 및 `next()` middleware function에 접근할 수 있음
 - 서로 다른 controller들 사이에 **중복되는 코드**가 있다면 middleware로 추출하는 것을 고려해 볼 수 있다.
 
@@ -247,14 +251,19 @@ app.get("/protected", handleProtected);
 ### 이미 개발되어 있는 Middleware 사용
 
 - Built-in middlewares
-  - `urlencoded(options)`
+  - `urlencoded(options)` : Header의 `content-type`이 `application/x-www-form-urlencoded`인 request의 body를 parsing해 주는 middleware
     ```js
     app.use(express.urlencoded({ extended: true }));
     ```
-    - Parses incoming requests with urlencoded payloads (the data in the body)
-    - `options` : select the library
-      - `{ extended: true }` : Uses the `querystring` library
-      - `{ extended: false }` : Uses the `qs` library
+    - `options`
+      - `extended` : URL encoded body를 Javascript object 형식으로 사용할 수 있도록 변환해 줌
+        - `{ extended: true }` : 변환 library를 `querystring`으로 사용
+        - `{ extended: false }` : 변환 library를 `qa`로 사용
+      - `parameterLimit` : Parameter 개수 제한
+  - `json(options)` : Header의 `content-type`이 `application/json`인 request의 body를 parsing해 주는 middleware
+    ```js
+    app.use(express.json());
+    ```
 - External middlewares
   - `morgan`
     ```
