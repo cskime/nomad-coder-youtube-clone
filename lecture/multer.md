@@ -1,4 +1,4 @@
-# File Upload
+# Multer
 
 - `multer` : file upload를 위한 package
 
