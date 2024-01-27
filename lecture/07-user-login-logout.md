@@ -248,3 +248,17 @@ if (!isMatched) {
   ```js
   res.status(400).render("view");
   ```
+
+## Logout
+
+- 로그인은 session이 유효할 때 가능한 것
+- 로그아웃으로 인식하는 경우
+  - 브라우저에서 cookie를 삭제하면 서버에서 session ID를 찾지 못함
+  - 서버에서 session DB의 데이터를 삭제하면 브라우저에서 보낸 session ID를 찾지 못함
+- `express-session`이 제공하는 `destroy()`를 사용하면 `express-session`이 생성한 session이 database에서 삭제되고 `req.session` object도 unset 되어 로그아웃 처리된다.
+  ```js
+  export const logout = (req, res) => {
+    req.session.destroy();
+    res.redirect("/"); // Logout 후 home 화면으로 redirect
+  };
+  ```
