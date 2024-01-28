@@ -330,7 +330,23 @@ export const postChangePassword = async (req, res) => {
 
 export const see = async (req, res) => {
   const { id } = req.params;
-  const user = await User.findById(id).populate("videos");
+
+  /* [ Double Populates ]
+   * 1. `User` model의 `videos` field에는 `Video`의 `ObjectId`가 저장되어 있음
+   * 2. `User`의 `videos`에 population을 사용하면 `Video` model로 치환됨
+   * 3. `Video` model은 `owner` field에 `User`의 `ObjectId`가 저장되어 있음
+   * 4. `Video`의 `owner`에 population을 사용해서 `User` model로 치환
+   *
+   * `Video.pug` view에서 `video.owner`로 user 정보를 받을 수 있도록 double population
+   */
+  // const user = await User.findById(id).populate("videos");
+  const user = await User.findById(id).populate({
+    path: "videos",
+    populate: {
+      path: "owner",
+      model: "User",
+    },
+  });
 
   /* User profile은 누구나 볼 수 있는 public page
    * 잘못된 user id를 사용해서 접근하면 404 page를 보여준다.
