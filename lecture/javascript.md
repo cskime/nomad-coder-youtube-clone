@@ -57,3 +57,9 @@
     import defaultFeature from "ModuleA";
     import { feat1, feat2 } from "ModuleA";
     ```
+
+## setTimeout
+
+- `setTimeout(callback,timeout)` : `timeout`(ms) 대기 후 `callback` 실행
+- `setTimeout(callback,timeout)`을 실행하면 브라우저가 `id`를 반환함
+- 이 `id`를 `clearTimeout(id)`에 넣으면 해당 timeout을 취소시킬 수 있다.
