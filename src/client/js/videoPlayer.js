@@ -1,11 +1,14 @@
 const video = document.querySelector("video");
 const playBtn = document.getElementById("play");
+const playBtnIcon = playBtn.querySelector("i");
 const muteBtn = document.getElementById("mute");
+const muteBtnIcon = muteBtn.querySelector("i");
 const currentTime = document.getElementById("currentTime");
 const totalTime = document.getElementById("totalTime");
 const volumeRange = document.getElementById("volume");
 const timelineRange = document.getElementById("timeline");
 const fullScreenBtn = document.getElementById("fullScreen");
+const fullScreenBtnIcon = fullScreenBtn.querySelector("i");
 const videoContainer = document.getElementById("videoContainer");
 const videoControls = document.getElementById("videoControls");
 
@@ -14,13 +17,17 @@ let controlsMovementTimeout = null;
 let volume = volumeRange.value;
 video.volume = volume;
 
-const handlePlayClick = (event) => {
+/* Video */
+
+const handleVideoPlay = () => {
   video.paused ? video.play() : video.pause();
-  playBtn.innerText = video.paused ? "Play" : "Pause";
+  playBtnIcon.className = video.paused ? "fa fa-play" : "fa fa-pause";
 };
 
 const handleMute = (event) => {
-  muteBtn.innerText = video.muted ? "Mute" : "Unmute";
+  muteBtnIcon.className = video.muted
+    ? "fas fa-volume-up"
+    : "fas fa-volume-mute";
   video.muted = !video.muted;
   volumeRange.value = video.muted ? 0 : volume;
 };
@@ -58,10 +65,10 @@ const handleTimelineChange = (event) => {
 
 const handleFullScreen = () => {
   if (document.fullscreenElement) {
-    fullScreenBtn.innerText = "Enter Full Screen";
+    fullScreenBtnIcon.className = "fas fa-expand";
     document.exitFullscreen();
   } else {
-    fullScreenBtn.innerText = "Exit Full Screen";
+    fullScreenBtnIcon.className = "fas fa-compress";
     videoContainer.requestFullscreen();
   }
 };
@@ -85,12 +92,26 @@ const handleMouseLeave = () => {
   controlsTimeout = setTimeout(hideControls, 3000);
 };
 
-playBtn.addEventListener("click", handlePlayClick);
+const handleSpacebarEvent = (event) => {
+  const isSpacebarEvent =
+    event.key === " " || event.code === "Space" || event.keyCode === 32;
+
+  if (!isSpacebarEvent) {
+    return;
+  }
+
+  handleVideoPlay();
+};
+
+playBtn.addEventListener("click", handleVideoPlay);
 muteBtn.addEventListener("click", handleMute);
 volumeRange.addEventListener("input", handleVolumeInput);
-video.addEventListener("loadedmetadata", handleLoadedMetadata);
+video.addEventListener("click", handleVideoPlay);
+video.addEventListener("loadeddata", handleLoadedMetadata);
 video.addEventListener("timeupdate", handleTimeUpdate);
-timelineRange.addEventListener("change", handleTimelineChange);
-fullScreenBtn.addEventListener("click", handleFullScreen);
 video.addEventListener("mousemove", handleMouseMove);
 video.addEventListener("mouseleave", handleMouseLeave);
+timelineRange.addEventListener("change", handleTimelineChange);
+fullScreenBtn.addEventListener("click", handleFullScreen);
+
+document.body.onkeyup = handleSpacebarEvent;
