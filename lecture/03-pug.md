@@ -199,3 +199,9 @@ app.set("view engine", "pub");
   - array(`[]`), object(`{}`) 등 순회.
   - `else` : array or object가 비어있을 때 (has no item)
 - `while`
+
+### 주석(comment)
+
+- `//` : HTML의 주석
+- `//-` : Pug 파일 안에서 주석
+- `//`는 HTML에서 `<!-- -->`로 변환되지만, `//-`는 source code 상의 주석이므로 HTML에 포함되지 않는다.

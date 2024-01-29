@@ -6,12 +6,15 @@ module.exports = {
    * `client` : 브라우저만을 위한 source code들을 저장
    * `assets` : Webpack이 변환한 source code. 실제 배포 후에는 `assets` file을 사용할 것
    */
-  entry: "./src/client/js/main.js",
+  entry: {
+    main: "./src/client/js/main.js",
+    videoPlayer: "./src/client/js/videoPlayer.js",
+  },
   plugins: [new MiniCssExtractPlugin({ filename: "css/styles.css" })],
   mode: "development",
   watch: true,
   output: {
-    filename: "js/main.js",
+    filename: "js/[name].js",
     path: path.resolve(__dirname, "assets"),
     clean: true,
   },

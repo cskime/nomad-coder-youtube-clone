@@ -33,35 +33,30 @@
   }
   ```
 
-## Webpack Configuration
+### Webpack Configuration
 
 - `webpack.config.js` 파일에서 configuration object를 export
 - `webpack.config.js` 파일에서는 오래된 javascript 코드만 이해할 수 있음
   - `import` -> `require()`
   - `export` -> `module.exports`
 
-### 변환할 File 및 변환된 File 경로 설정
+## 변환할 File 및 변환된 File 경로 설정
+
+### 단일 파일 설정
 
 ```js
 const path = require("path");
 module.exports = {
-  entry: "./src/client/js/main.js,
+  entry: "./src/client/js/main.js",
   output: {
-    filename: "main.js",
+    filename: "js/main.js",
     path: path.resolve(__dirname, "assets", "js"),
     clean: true,
   },
-}
+};
 ```
 
 - `entry` : 변환할 source file 경로 지정
-  - Entry point로 `main.js` 사용
-  - CSS file까지 한 번에 변환하기 위해 `main.js` 내부에서 css도 함께 import
-    ```js
-    import "../scss/styles.scss";
-    // some code
-    ```
-  - 여기서 import된 CSS는 rule에서 `css-loader`를 설정해서 CSS 코드로 변환
 - `output` : 변환된 source file을 저장할 경로 설정
   - `filename` : 변환된 source file의 이름
   - `path` : 변환된 source file의 경로 (**absolute path**)
@@ -70,7 +65,43 @@ module.exports = {
   - `clean` : Webpack을 실행할 때 output 경로에 있던 이전 file들 삭제
 - `entry`, `output`은 required
 
-### 변환 방식 설정
+### 여러 파일들을 포함시키는 방법
+
+```js
+const path = require("path");
+module.exports = {
+  entry: {
+    main: "./src/client/js/main.js",
+    videoPlayer: "./src/client/js/videoPlayer.js",
+  },
+  output: {
+    filename: "js/[name].js",
+    path: path.resolve(__dirname, "assets", "js"),
+    clean: true,
+  },
+};
+```
+
+- `entry` file이 둘 이상인 경우 object로 설정
+  - `entry` object의 key는 `output`에서 변환될 파일 이름으로 사용됨
+  - 어떤 이름이든 사용할 수 있지만, 변환할 file과 같은 이름을 사용하는게 구분하기 좋다.
+- `output`에서 둘 이상의 file로 변환될 수 있도록 `filename` 수정
+  - Webpack은 `output`에서 `[name]` keyword에 `entry`의 object key를 사용함
+  - 위 예시에서는 두 가지 파일로 변환될 것: `js/main.js`, `js.videoPlayer.js`
+
+## Importing CSS/SCSS
+
+- CSS file까지 한 번에 변환하기 위해 `main.js` 내부에서 css도 함께 import
+  ```js
+  // main.js
+  import "../scss/styles.scss";
+  console.log("hi");
+  ```
+- 원래 Javascript 파일에서는 css/scss 파일을 import 할 수 없음
+- Webpack이 Javascript에 import한 css 파일을 읽어서 변환할 때 통합해 준다.
+  - Import된 CSS는 rule에서 설정한 `css-loader`를 통해 CSS 코드로 변환된다.
+
+## 변환 방식 설정
 
 ```js
 const path = require("path");
@@ -118,7 +149,7 @@ module.exports = {
       - 분산된 CSS를 하나의 CSS file로 합쳐준다.
     - `style-loader` : CSS를 DOM에 주입 (`<head>` 안의 `<style>`에 CSS code를 넣어줌)
 
-### Mode 설정
+## Mode 설정
 
 ```js
 const path = require("path");
@@ -135,7 +166,7 @@ module.exports = {
   - `development` mode : 변환된 code에 comment 등 개발 중 필요한 정보들이 추가됨
   - `production` mode : File을 실제로 압축. Backend를 서버에 올릴 때 `production`으로 변경
 
-### Watch 설정
+## Watch 설정
 
 - 파일이 변경되는 것을 감지(watch)해서 webpack을 실행시켜 줌
   ```js
