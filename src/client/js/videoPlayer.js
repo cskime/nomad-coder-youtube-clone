@@ -113,5 +113,4 @@ video.addEventListener("mousemove", handleMouseMove);
 video.addEventListener("mouseleave", handleMouseLeave);
 timelineRange.addEventListener("change", handleTimelineChange);
 fullScreenBtn.addEventListener("click", handleFullScreen);
-
-document.body.onkeyup = handleSpacebarEvent;
+document.addEventListener("keyup", handleSpacebarEvent);
