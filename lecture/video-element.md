@@ -45,3 +45,10 @@
   // or
   new Date(seconds * 1000).toISOString().substring(14, 19);
   ```
+
+## Full Screen
+
+- `Element.requestFullScreen()` : Video를 full screen으로 열어준다.
+  - `Element`의 하위 element들이 모두 full screen에 포함됨
+- `Document.exitFullScreen` : Full screen mode 종료
+- `Document.fullScreenElement` : 현재 full screen으로 보여지고 있는 element
