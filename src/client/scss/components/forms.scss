@@ -7,7 +7,7 @@ form {
     border: 1px solid rgba($color: #fff, $alpha: 0.2);
 }
 
-input:not(input[type="range"]) {
+input:not(input[type="range"]), input[type="submit"] {
     all: unset;
     padding: 15px 20px;
     border-radius: 5px;
@@ -24,11 +24,19 @@ input:not(input[type="range"]) {
 }
 
 input[type="submit"], .social__btn {
-    padding: 10px 20px;
     border-radius: 5px;
-    color: $color-primary;
-    background-color: white;
-    text-align: center;
+    padding: 10px 20px;
+    background-color: white !important;
+    color: $color-primary !important;
+    text-align: center !important;
     cursor: pointer;
     display: block;
+    border: none;
+    &:focus {
+        outline: none;
+    }
+    &:disabled {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 }

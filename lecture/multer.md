@@ -33,46 +33,41 @@
     .post(uploadFilesMiddleware.single("avatar"), postEdit);
   ```
   - `single(fieldName)` : 단일 file upload
+  - `fileds(fields)` : 여러 개의 file들을 upload
   - `fieldName` : client에서 file을 upload할 때 사용한 field name (file input의 `name` attribute)
-- Controller에서 `req.file`로 upload된 file에 접근
-
-  ```js
-  export const postEdit = async (req, res) => {
-    /*  [ File object ]
-        {
-          fieldname: "",
-          originalname: "",
-          encoding: "",
-          mimetype: "",
-          destination: "",
-          filename: "",
-          path: "",
-          size: 0
-        }
-     */
-    const {
-      session: {
-        user: { _id, avatarUrl }
-      },
-      body: { ... },
-      file: { path },
-    } = req;
-    ...
-
-    const updatedUser = await User.findByIdAndUpdate(
-      _id,
-      {
-        /* File을 선택하지 않았을 때는 `file`이 `undefined`이므로
-         * user 정보 update시 avatar를 업로드하지 않으면 session에 저장된 기본 avatar를 사용한다.
-         */
-        avatarUrl: file ? file.path : avatarUrl,
+- Controller에서 upload된 file에 접근
+  - File object
+    ```json
+    {
+      "fieldname": "",
+      "originalname": "",
+      "encoding": "",
+      "mimetype": "",
+      "destination": "",
+      "filename": "",
+      "path": "",
+      "size": 0
+    }
+    ```
+  - `req`로부터 file 가져오기
+    ```js
+    export const postUpload = async (req, res) => {
+      const {
         ...
-      },
-      { new: true }
-    )
-    ...
-  };
-  ```
+        file: { path }, // `single()`로 video 1개만 upload 했을 때
+        files: { video, thumbnail } // `fields()`로 video, thumbnail 등 두 개 이상 file을 upload 했을 때
+      } = req;
+      ...
+    };
+    ```
+  - File path 저장
+    ```js
+    const newVideo = await Video.create({
+      // video와 thumbnail 두 개의 file을 upload하는 경우
+      fileUrl: video[0].path,
+      thumbnailUrl: thumbnail[0].path,
+    });
+    ```
 
 ## Show an Image
 

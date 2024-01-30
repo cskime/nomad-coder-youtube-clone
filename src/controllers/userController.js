@@ -347,6 +347,7 @@ export const see = async (req, res) => {
       model: "User",
     },
   });
+  console.log(user);
 
   /* User profile은 누구나 볼 수 있는 public page
    * 잘못된 user id를 사용해서 접근하면 404 page를 보여준다.

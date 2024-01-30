@@ -117,6 +117,23 @@
 ## Browser Object URL
 
 - `URL.createObjectURL(object)` : object URL 반환
-- Browser memory에서만 사용 가능한 URL 생성
-- Object를 browser의 in-memory에 저장해 두고 해당 object에 접근할 수 있는 URL을 반환한다.
-- URL만 보면 server에 의해 hosting되는 것처럼 보지만 실제로는 아님 (URL에 직접 접근 불가)
+  - Browser memory에서만 사용 가능한 URL 생성
+  - Object를 browser의 in-memory에 저장해 두고 해당 object에 접근할 수 있는 URL을 반환한다.
+  - URL만 보면 server에 의해 hosting되는 것처럼 보지만 실제로는 아님 (URL에 직접 접근 불가)
+- `URL.revokeObjectURL(url)`
+  - `URL.createObjectURL(object)`로 생성한 url을 memory에서 삭제
+  - 더 이상 사용하지 않는 url을 메모리에서 삭제하여 성능 최적화
+
+## Download file from href in `<a>` tag
+
+```js
+const a = document.createElement("a");
+a.href = fileUrl;
+a.download = "filename.mp4"; // mp4로 변환했으므로 확장자를 `mp4`로 명시
+document.body.appendChild(a);
+a.click();
+```
+
+- HTML에서 `<a>` tag에 `download` attribute를 추가하면 `href` 경로로 이동하는 대신 파일로 다운로드함
+- `download="filename"` : 다운로드하는 file의 이름을 `filename`으로 변경
+- Javascript에서도 `download` 속성에 `filename`을 할당함으로써 다운로드 링크로 변경

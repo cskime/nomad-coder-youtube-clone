@@ -47,5 +47,11 @@ videoRouter
   .route("/upload")
   .all(protectorMiddleware)
   .get(getUpload)
-  .post(uploadVideo.single("video"), postUpload);
+  .post(
+    // Video file 1개만 upload 할 때는 single() 사용
+    // Video 및 thumbnail까지 둘 이상 file을 upload 할 때는 fields() 사용
+    uploadVideo.fields([{ name: "video" }, { name: "thumbnail" }]),
+    postUpload
+  );
+
 export default videoRouter;
