@@ -5,6 +5,7 @@ import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import videoRouter from "./routers/videoRouter";
 import userRouter from "./routers/userRouter";
+import apiRouter from "./routers/apiRouter";
 import { localsMiddleware } from "./middlewares";
 // import { connection } from "mongoose";
 
@@ -42,7 +43,8 @@ app.use("/uploads", express.static("uploads"));
 app.use("/static", express.static("assets")); // Client에서 webpack 변환 file에 접근할 수 있도록 설정
 
 app.use("/", rootRouter);
-app.use("/users", userRouter);
 app.use("/videos", videoRouter);
+app.use("/users", userRouter);
+app.use("/api", apiRouter);
 
 export default app;

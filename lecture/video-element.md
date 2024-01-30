@@ -52,3 +52,7 @@
   - `Element`의 하위 element들이 모두 full screen에 포함됨
 - `Document.exitFullScreen` : Full screen mode 종료
 - `Document.fullScreenElement` : 현재 full screen으로 보여지고 있는 element
+
+## Video 종료 감지
+
+- Video element에서 발생하는 `ended` event(`HTMLMediaElement`)를 통해 video가 끝나는 시점을 알 수 있다.

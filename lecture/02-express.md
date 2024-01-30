@@ -165,6 +165,11 @@ app.listen(PORT, () => {
   ```js
   res.status(400).end(); // chainable
   ```
+- `res.sendStatus(code)` : Status code를 설정한 뒤 client로 response를 보냄
+  ```js
+  res.sendStatus(404);
+  ```
+  - `res.status(code)`는 response에 status code를 추가하기만 하고, 실제로 응답을 보내진 않는다.
 
 ## Middlewares
 

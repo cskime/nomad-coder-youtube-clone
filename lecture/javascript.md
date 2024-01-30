@@ -63,3 +63,35 @@
 - `setTimeout(callback,timeout)` : `timeout`(ms) 대기 후 `callback` 실행
 - `setTimeout(callback,timeout)`을 실행하면 브라우저가 `id`를 반환함
 - 이 `id`를 `clearTimeout(id)`에 넣으면 해당 timeout을 취소시킬 수 있다.
+
+## fetch
+
+- Javascript에서 URL로 요청을 보내는 방법
+- `fetch(URL,init)`
+  ```js
+  fetch(`/api/videos/{VIDEO_ID}/view`, { method: "POST" });
+  ```
+  - `init`에 전달하는 object에서 `method`를 변경하여 POST request를 보낸다.
+
+## Save custom data in the HTML and Get the value in the Javascript code
+
+- `data-value` attribute를 HTML element tag에 저장해 두면
+  ```html
+  <article
+    id="electric-cars"
+    data-columns="3"
+    data-index-number="12314"
+    data-parent="cars"
+  >
+    ...
+  </article>
+  ```
+- Javascript에서 `element.dataset.value`로 저장한 값을 사용할 수 있음
+  ```js
+  const article = document.querySelector("#electric-cars");
+  article.dataset.columns; // "3"
+  article.dataset.indexNumber; // "12314"
+  article.dataset.parent; // "cars"
+  ```
+- `data-value` attribute의 `value`는 javascript에서 대소문자 구분 없이 모두 소문자로 표시됨
+- **Javascript 쪽에서 camel case로 값을 받아오고 싶다면 HTML에서는 `-`로 구분해야 한다.**

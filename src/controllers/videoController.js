@@ -212,3 +212,18 @@ export const deleteVideo = async (req, res) => {
   await Video.findByIdAndDelete(id);
   res.redirect("/");
 };
+
+export const registerView = async (req, res) => {
+  const { id } = req.params;
+  const video = await Video.findById(id);
+  if (!video) {
+    // Backend에서 view를 rendering하지 않을 것이므로 status code만 보낸다.
+    // Status code는 요청이 정상적으로 수행되었는지 알려주는 것
+    // Frontend에서는 조회수를 더하지 못했다는 것을 알 필요는 없으므로 status code를 사용하지는 않을 것
+    // 조회수를 올릴 때 error가 발생했다는 것을 사용자에게 알려 줄 필요 없음
+    return res.sendStatus(404);
+  }
+  video.meta.views += 1;
+  await video.save();
+  res.sendStatus(200);
+};
