@@ -9,6 +9,7 @@ html(lang="ko")
         main
             block content
         include partials/footer
+        script(src="/static/js/main.js")
         //- base.pug는 모든 template이 extend하는 root temeplate
         //- Webpage별로 필요한 script가 다르므로, 확장하는 쪽에서 script를 지정할 수 있어야 한다.
         block scripts

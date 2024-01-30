@@ -64,6 +64,24 @@
 - `setTimeout(callback,timeout)`을 실행하면 브라우저가 `id`를 반환함
 - 이 `id`를 `clearTimeout(id)`에 넣으면 해당 timeout을 취소시킬 수 있다.
 
+### Date를 활용한 Time Formatting
+
+- `Date` object를 통해 time format을 쉽게 변환할 수 있다.
+  - '1970/1/1'을 기준으로 특정 시점까지 시간을 ms 단위로 사용함
+- `toISOString` : ISO8601 format `yyyy-MM-ddThh:mm:ss.zzzZ` 문자열 반환
+  - GMT 0 기준시 사용
+- Date string에서 `hh:mm:ss` 부분만 잘라내기
+  - `substr(startIndex, length)` : `startIndex`부터 `length`만큼의 문자열 반환
+    - _Deprecaetd API이므로 `subString()`을 사용한다._
+  - `subString(startIndex, endIndex)` : 문자열에서 `startIndex` ~ `endIndex`까지의 문자열 반환
+- 코드 예시
+  ```js
+  // 00:00:00 부분만 잘라서 substring을 가져온다.
+  new Date(timestamp).toISOString().substr(11, 8);
+  // or
+  new Date(seconds * 1000).toISOString().substring(14, 19);
+  ```
+
 ## fetch
 
 - Javascript에서 URL로 요청을 보내는 방법
@@ -95,3 +113,10 @@
   ```
 - `data-value` attribute의 `value`는 javascript에서 대소문자 구분 없이 모두 소문자로 표시됨
 - **Javascript 쪽에서 camel case로 값을 받아오고 싶다면 HTML에서는 `-`로 구분해야 한다.**
+
+## Browser Object URL
+
+- `URL.createObjectURL(object)` : object URL 반환
+- Browser memory에서만 사용 가능한 URL 생성
+- Object를 browser의 in-memory에 저장해 두고 해당 object에 접근할 수 있는 URL을 반환한다.
+- URL만 보면 server에 의해 hosting되는 것처럼 보지만 실제로는 아님 (URL에 직접 접근 불가)
