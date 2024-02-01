@@ -5,8 +5,9 @@ const handleSubmit = (event) => {
   // code만 실행되고 page를 새로고침하는 브라우저의 기본 동작을 막는다.
   event.preventDefault();
 
+  const textarea = form.querySelector("textarea");
   const videoId = videoContainer.dataset.videoId;
-  const text = form.querySelector("textarea").value;
+  const text = textarea.value;
 
   if (text === "") {
     return;
@@ -20,6 +21,8 @@ const handleSubmit = (event) => {
       "Content-Type": "application/json",
     },
   });
+
+  textarea.value = "";
 };
 
 // <form> 안에 있는 button을 클릭할 때 발생하는 submit event를 사용해야 함
