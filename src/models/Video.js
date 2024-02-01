@@ -23,6 +23,9 @@ const videoSchema = new mongoose.Schema({
    * - `Video` model은 `User` model과 연결될 것이므로 `ref: "User"`
    */
   owner: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
+  comments: [
+    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Comment" },
+  ],
 });
 
 /*  [ Hashtag formatting 코드를 재사용하기 위한 방법 ]
