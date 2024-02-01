@@ -205,7 +205,7 @@ export const deleteVideo = async (req, res) => {
   const { id } = req.params;
   const {
     user: { _id },
-  } = req.sesion;
+  } = req.session;
 
   const video = await Video.findById(id);
   if (!video) {
