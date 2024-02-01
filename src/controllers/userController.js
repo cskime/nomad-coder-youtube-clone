@@ -195,6 +195,7 @@ export const finishGitHubLogin = async (req, res) => {
 
 export const logout = (req, res) => {
   req.session.destroy();
+  req.flash("info", "Bye Bye");
   res.redirect("/");
 };
 
@@ -272,6 +273,7 @@ export const getChangePassword = (req, res) => {
    * View template에서도 social only user는 password 변경 버튼을 볼 수 없는게 좋을 것
    */
   if (req.session.user.socialOnly) {
+    req.flash("error", "Can't change password.");
     return res.redirect("/");
   }
   res.render("users/change-password", { pageTitle: "Change Password" });
@@ -322,6 +324,7 @@ export const postChangePassword = async (req, res) => {
   await user.save();
 
   // send notification
+  req.flash("info", "Password updated");
 
   /* Password 변경에 성공하면 logout 시킨 후 다시 로그인하게 만들기
    */

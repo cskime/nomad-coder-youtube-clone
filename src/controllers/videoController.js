@@ -62,6 +62,7 @@ export const getEdit = async (req, res) => {
   // video.owner는 `ObjectId` type인 object
   // req.session.user._id는 `string` type인 value
   if (String(video.owner) !== req.session.user._id) {
+    req.flash("error", "Not authorized");
     return res.status(403).redirect("/");
   }
 
@@ -112,6 +113,7 @@ export const postEdit = async (req, res) => {
   }
 
   if (String(video.owner) !== _id) {
+    req.flash("error", "You are not the owner fo the video.");
     return res.status(403).redirect("/");
   }
 
@@ -122,6 +124,7 @@ export const postEdit = async (req, res) => {
     hashtags: Video.formatHashtags(hashtags),
   });
 
+  req.flash("success", "Changes saved.");
   return res.redirect(`/videos/${id}`);
 };
 
