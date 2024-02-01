@@ -85,11 +85,28 @@
 ## fetch
 
 - Javascript에서 URL로 요청을 보내는 방법
-- `fetch(URL,init)`
+- `fetch(URL,requestInit)`
+- POST request : `requestInit` object의 `method`로 설정
   ```js
   fetch(`/api/videos/{VIDEO_ID}/view`, { method: "POST" });
   ```
-  - `init`에 전달하는 object에서 `method`를 변경하여 POST request를 보낸다.
+- Request with body
+  - Body에 data를 담아서 보낼 때는 text로 전송해야 함
+    ```js
+    fetch(`/api/videos/${videoId}/comment`, {
+      method: "POST",
+      body: "some data",
+    });
+    ```
+  - 크기가 큰 여러 개의 data를 전송할 때는 **`JSON.stringify(object)`**를 사용해서 **object를 JSON string으로 변환**한 뒤 전송
+    ```js
+    fetch(`/api/videos/${videoId}/comment`, {
+      method: "POST",
+      body: JSON.stringify({ text }),
+      headers: { "Content-Type": "application/json" },
+    });
+    ```
+    - 이 때, body payload를 JSON으로 parsing해야 한다는 것을 backend에게 알려주기 위해 header에 **"Content-Type**을 `application/json`으로 명시해야 함
 
 ## Save custom data in the HTML and Get the value in the Javascript code
 

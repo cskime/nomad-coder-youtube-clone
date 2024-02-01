@@ -269,6 +269,12 @@ app.get("/protected", handleProtected);
     ```js
     app.use(express.json());
     ```
+    - Body로 JSON string을 보낼 때 header에 `"Content-Type": "application/json"`을 담아서 보냄
+    - Express server는 `"Content-Type"`이 `"application/json"`인 request를 받으면 내부적으로 **`JSON.parse(string)`**를 사용해서 parsing하고, Javascript object로 변환해서 `req.body`에 매핑해 줌
+  - `text()` : Express server가 request body로 전달되는 text를 parsing하도록 하는 middleware
+    ```js
+    app.use(express.text());
+    ```
 - External middlewares
   - `morgan`
     ```

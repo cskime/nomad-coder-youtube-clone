@@ -18,8 +18,11 @@ app.set("views", process.cwd() + "/src/views");
 const logger = morgan("dev");
 app.use(logger);
 
-const parser = express.urlencoded({ extended: true });
-app.use(parser);
+// URL encoded body payload를 받도록 설정
+app.use(express.urlencoded({ extended: true }));
+
+// JSON body payload를 받도록 설정
+app.use(express.json());
 
 const sessionMiddleware = session({
   secret: process.env.COOKIE_SECRET,

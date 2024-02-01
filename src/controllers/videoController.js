@@ -232,3 +232,9 @@ export const registerView = async (req, res) => {
   await video.save();
   res.sendStatus(200);
 };
+
+export const createComment = async (req, res) => {
+  console.log(req.params);
+  console.log(req.body);
+  res.end();
+};
