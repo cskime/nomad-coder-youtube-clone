@@ -37,8 +37,12 @@
             display: flex;
             gap: 8px;
             align-items: center;
-            span:first-of-type {
+            span {
                 flex-grow: 1;
+            }
+            button {
+                all: unset;
+                cursor: pointer;
             }
         }
     }

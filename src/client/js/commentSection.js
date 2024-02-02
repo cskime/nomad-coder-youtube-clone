@@ -1,18 +1,51 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
+const commentDeleteBtns = document.querySelectorAll(".video__comment button");
+
+const handleDelete = async (event) => {
+  const videoId = videoContainer.dataset.videoId;
+  const commentId = event.target.dataset.id;
+  const response = await fetch(`/api/videos/${videoId}/comment`, {
+    method: "DELETE",
+    body: JSON.stringify({ commentId }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (response.status !== 204) {
+    return;
+  }
+
+  const comments = document.querySelectorAll(".video__comment");
+  comments.forEach((value) => {
+    const id = value.querySelector("button").dataset.id;
+    if (commentId !== id) {
+      return;
+    }
+    value.remove();
+  });
+};
 
 const addComment = (text, commentId) => {
-  const videoComments = document.querySelector(".video__comments ul");
   const newComment = document.createElement("li");
   newComment.className = "video__comment";
-  newComment.dataset.id = commentId;
+
   const commentIcon = document.createElement("i");
   commentIcon.className = "fas fa-comment";
+  newComment.appendChild(commentIcon);
+
   const commentText = document.createElement("span");
   commentText.innerText = text;
-  const commentRemove = document.createElement("span");
-  newComment.appendChild(commentIcon);
   newComment.appendChild(commentText);
+
+  const deleteCommentButton = document.createElement("button");
+  deleteCommentButton.innerText = "❌";
+  deleteCommentButton.dataset.id = commentId;
+  deleteCommentButton.addEventListener("click", handleDelete);
+  newComment.appendChild(deleteCommentButton);
+
+  const videoComments = document.querySelector(".video__comments ul");
   videoComments.prepend(newComment);
 };
 
@@ -58,3 +91,7 @@ const handleSubmit = async (event) => {
 if (form) {
   form.addEventListener("submit", handleSubmit);
 }
+
+commentDeleteBtns.forEach((value) => {
+  value.addEventListener("click", handleDelete);
+});
