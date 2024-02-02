@@ -254,5 +254,10 @@ export const createComment = async (req, res) => {
   video.comments.push(comment._id);
   await video.save();
 
-  res.sendStatus(201);
+  /* Browser에서 서버 요청을 최소화하기 위해 comment를 생성하면 직접 element를 만들어서 보여줌
+   * 이후 새로고침 없이 그 comment를 삭제하려는 경우, browser에서 comment id가 필요함
+   * Server가 client에 response를 받을 때 생성된 comment id를 보내주면, browser가 사용할 수 있음
+   */
+  // res.sendStatus(201);
+  res.status(201).json({ newCommentId: comment._id });
 };

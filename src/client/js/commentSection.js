@@ -1,15 +1,17 @@
 const videoContainer = document.getElementById("videoContainer");
 const form = document.getElementById("commentForm");
 
-const addComment = (text) => {
+const addComment = (text, commentId) => {
   const videoComments = document.querySelector(".video__comments ul");
   const newComment = document.createElement("li");
   newComment.className = "video__comment";
+  newComment.dataset.id = commentId;
   const commentIcon = document.createElement("i");
   commentIcon.className = "fas fa-comment";
-  newComment.appendChild(commentIcon);
   const commentText = document.createElement("span");
   commentText.innerText = text;
+  const commentRemove = document.createElement("span");
+  newComment.appendChild(commentIcon);
   newComment.appendChild(commentText);
   videoComments.prepend(newComment);
 };
@@ -26,7 +28,7 @@ const handleSubmit = async (event) => {
     return;
   }
 
-  const { status } = await fetch(`/api/videos/${videoId}/comment`, {
+  const response = await fetch(`/api/videos/${videoId}/comment`, {
     method: "POST",
     body: JSON.stringify({ text }),
     headers: {
@@ -42,9 +44,10 @@ const handleSubmit = async (event) => {
    * 새 comment를 만들면 해당 comment의 HTML view를 직접 만들어서 보여주고,
    * 나중에 reload 될 때는 서버에서 받아온 comment를 보여주는 방식으로 효율을 개선한다.
    */
-  if (status === 201) {
-    console.log("Create fake comment");
-    addComment(text);
+  if (response.status === 201) {
+    // 새로 생성된 comment id를 server로부터 받아옴
+    const { newCommentId } = await response.json();
+    addComment(text, newCommentId);
   }
 
   textarea.value = "";
