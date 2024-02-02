@@ -29,7 +29,7 @@ export const search = async (req, res) => {
 
 export const watch = async (req, res) => {
   const { id } = req.params;
-  const video = await Video.findById(id).populate("owner");
+  const video = await Video.findById(id).populate("owner").populate("comments");
 
   /* */
   // const owner = await User.findById(video.owner);
@@ -251,6 +251,8 @@ export const createComment = async (req, res) => {
     owner: user._id,
     video: id,
   });
+  video.comments.push(comment._id);
+  await video.save();
 
   res.sendStatus(201);
 };

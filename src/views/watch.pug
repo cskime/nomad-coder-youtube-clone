@@ -17,29 +17,34 @@ block content
             div
                 button#fullScreen 
                     i.fas.fa-expand
-    div 
-        p=video.description
-        small=video.createdAt
-    div 
-        small Uploaded by 
-            a(href=`/users/${video.owner._id}`) #{video.owner.name}
-
-    if String(video.owner._id) === String(user._id)
-        //- [ Absolute vs. Relative URL in href ]
-        //- `/`을 붙이면 absolute url로 동작
-        //- Root : localhost:4000
-        //- Current : localhost:4000/videos/1
-        //- `href="/edit" : `{ROOT}/edit`으로 이동
-        //- `href="edit" : `{CURRENT}/edit`으로 이동
-        a(href=`${video.id}/edit`) Edit Video &rarr;
-        br
-        a(href=`${video.id}/delete`) Delete Video &rarr;
+    div.video__data 
+        p.video__title=video.description
+        small.video__owner Uploaded by 
+            a(href=`/users/${video.owner._id}`)=video.owner.name
+        small.video__createdAt=new Date(video.createdAt).toLocaleDateString("ko-kr", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
+        if String(video.owner._id) === String(user._id)
+            //- [ Absolute vs. Relative URL in href ]
+            //- `/`을 붙이면 absolute url로 동작
+            //- Root : localhost:4000
+            //- Current : localhost:4000/videos/1
+            //- `href="/edit" : `{ROOT}/edit`으로 이동
+            //- `href="edit" : `{CURRENT}/edit`으로 이동
+            a(href=`${video.id}/edit`) Edit Video &rarr;
+            br
+            a(href=`${video.id}/delete`) Delete Video &rarr;
     
     if isLoggedIn
-        div.video__comments
+        div.video__add-comments
             form.video__comment-form#commentForm
                 textarea(cols="30", rows="10", placeholder="Write a comment...")
                 button Add Comment
+
+    div.video__comments
+        ul
+            each comment in video.comments.reverse()
+                li.video__comment
+                    i.fas.fa-comment 
+                    span  #{comment.text}
 
 block scripts 
     script(src="/static/js/videoPlayer.js")
