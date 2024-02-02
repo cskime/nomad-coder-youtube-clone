@@ -4,7 +4,7 @@ const commentDeleteBtns = document.querySelectorAll(".video__comment button");
 
 const handleDelete = async (event) => {
   const videoId = videoContainer.dataset.videoId;
-  const commentId = event.target.dataset.id;
+  const commentId = event.target.parentNode.dataset.id;
   const response = await fetch(`/api/videos/${videoId}/comment`, {
     method: "DELETE",
     body: JSON.stringify({ commentId }),
@@ -17,10 +17,8 @@ const handleDelete = async (event) => {
     return;
   }
 
-  const comments = document.querySelectorAll(".video__comment");
-  comments.forEach((value) => {
-    const id = value.querySelector("button").dataset.id;
-    if (commentId !== id) {
+  document.querySelectorAll(".video__comment").forEach((value) => {
+    if (value.dataset.id !== commentId) {
       return;
     }
     value.remove();
@@ -30,6 +28,7 @@ const handleDelete = async (event) => {
 const addComment = (text, commentId) => {
   const newComment = document.createElement("li");
   newComment.className = "video__comment";
+  newComment.dataset.id = commentId;
 
   const commentIcon = document.createElement("i");
   commentIcon.className = "fas fa-comment";
@@ -41,7 +40,6 @@ const addComment = (text, commentId) => {
 
   const deleteCommentButton = document.createElement("button");
   deleteCommentButton.innerText = "❌";
-  deleteCommentButton.dataset.id = commentId;
   deleteCommentButton.addEventListener("click", handleDelete);
   newComment.appendChild(deleteCommentButton);
 
