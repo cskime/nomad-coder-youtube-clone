@@ -1,9 +1,30 @@
 import multer from "multer";
+import multerS3 from "multer-s3";
+import aws from "aws-sdk";
+
+const s3 = new aws.S3({
+  credentials: {
+    accessKeyId: process.env.AWS_ID,
+    secretAccessKey: process.env.AWS_SECRET,
+  },
+});
+
+const isHeroku = process.env.NODE_ENV === "production";
+
+const s3ImageUploader = multerS3({
+  s3,
+  bucket: "wetubeee/images", // S3 bucket name
+});
+const s3VideoUploader = multerS3({
+  s3,
+  bucket: "wetubeee/videos", // S3 bucket name
+});
 
 export const localsMiddleware = (req, res, next) => {
   // Pug template에서 사용할 전역 property 설정
   res.locals.isLoggedIn = req.session.isLoggedIn;
   res.locals.user = req.session.user || {};
+  res.locals.isHeroku = isHeroku;
   next();
 };
 
@@ -37,8 +58,10 @@ export const uploadFilesMiddleware = multer({ dest: "uploads/" });
 export const uploadAvatar = multer({
   dest: "uploads/avatars/",
   limits: { fileSize: 1 * 1024 }, // 1MB 업로드 제한 (bytes)
+  storage: isHeroku ? s3ImageUploader : undefined,
 });
 export const uploadVideo = multer({
   dest: "uploads/videos/",
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB 업로드 제한 (bytes)
+  storage: isHeroku ? s3VideoUploader : undefined,
 });

@@ -1,5 +1,10 @@
 # Summary
 
+- local 환경에서 개발 완료
+- babel/webpack 등으로 transcode 및 bundling
+- build된 코드로 frontend/backend 실행 환경 구축
+- 서버에서 `npm start`가 실행되며 압축/변환/번들링된 코드가 브라우저에서 실행됨
+
 ## Database 연동 과정
 
 ## Server 동작 흐름
@@ -27,3 +32,8 @@
 ## Multer를 사용한 file upload 과정
 
 ## FFmpeg.js를 사용한 video file transcode 과정
+
+## Deployment
+
+1. Building the backend code with `babel-cli`
+2. Building the frontend code with Webpack

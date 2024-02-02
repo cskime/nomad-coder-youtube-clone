@@ -232,6 +232,14 @@ export const postEdit = async (req, res) => {
    * 이 때, `findByIdAndUpdate`는 update 이전의 객체를 반환하므로,
    * `{ new: true }` option을 추가해야 updated user를 가져올 수 있다.
    */
+
+  let uploadURL;
+  if (file) {
+    uploadURL = file.path ?? file.location;
+  } else {
+    uploadURL = avatarUrl;
+  }
+
   const uploadedURL = `/${file ? file.path : avatarUrl}`;
   const updatedUser = await User.findByIdAndUpdate(
     _id,
