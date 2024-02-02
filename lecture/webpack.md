@@ -176,8 +176,9 @@ module.exports = {
     ...
   }
   ```
-- 이 설정을 활성화하면 webpack을 실행했을 때 process가 종료되지 않음
-- 코드가 수정될 때 마다 webpack을 실행해서 다시 compile함
+- 이 설정을 활성화하면 webpack을 실행했을 때 process가 종료되지 않고 **target file의 수정 여부**를 감시함
+- 코드가 수정될 때 마다 다시 bundling/compile해서 `assets` 생성
+- `development` mode에서만 사용. `production` mode에서는 코드를 수정하지 않을 것이므로 필요 없다.
 
 ## Mini CSS Extract Plugin
 
@@ -240,4 +241,22 @@ module.exports = {
       <script src="/static/js/main.js"></script>
     </body>
   </html>
+  ```
+
+## 외부에서 config 설정 주입
+
+- `mode`, `watch` 등 상황에 따라 일부 설정을 on/off 해야 할 때가 있다.
+- `webpack` 명령어를 실행할 때 `webpack.config.js`로 config 설정을 주입할 수 있다.
+  - `--mode` : `mode` 설정 주입
+  - `--watch` or `-w` : `watch` 설정 on/off
+- `package.json`에서 상황에 따라 `mode`와 `watch` 설정을 다르게 적용해서 script를 실행할 수 있다.
+  ```json
+  {
+    ...,
+    "scripts": {
+      ...,
+      "build:assets": "webpack --mode=production", // 상용 환경으로 배포하기 위한 변환
+      "dev:assets": "webpack --mode=development -w", // 개발 환경에서 변환. 개발 편의를 위해 watch 설정이 추가됨
+    }
+  }
   ```

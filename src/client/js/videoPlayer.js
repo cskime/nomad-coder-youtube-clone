@@ -107,7 +107,6 @@ const handleEnded = () => {
   // Backend에서 video id를 Frontend로 전달하기 위해
   // `#videoContainer` element에 `data-videoId`로 video id 값을 저장해 둠
   // Frontend에서는 `videoContainer.dataset.videoId`로 접근해서 값을 사용할 수 있음
-  console.log(videoContainer.dataset);
   const { videoId } = videoContainer.dataset;
   fetch(`/api/videos/${videoId}/view`, { method: "POST" });
 };

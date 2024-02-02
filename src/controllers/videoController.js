@@ -8,10 +8,8 @@ export const home = async (req, res) => {
     const videos = await Video.find({})
       .sort({ createdAt: "desc" })
       .populate("owner");
-    console.log(videos);
     res.render("home", { pageTitle: "Home", videos });
   } catch (error) {
-    console.log(error);
     res.render("server-error");
   }
 };
@@ -193,7 +191,6 @@ export const postUpload = async (req, res) => {
     user.save();
     res.redirect("/");
   } catch (error) {
-    console.log(error);
     res.status(400).render("upload", {
       pageTitle: "Upload Video",
       errorMessage: error._message,
